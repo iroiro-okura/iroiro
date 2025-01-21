@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Corggle',
       theme: ThemeData(
+          fontFamily: 'Murecho',
           colorScheme: const ColorScheme(
               brightness: Brightness.light,
               primary: Color.fromRGBO(216, 216, 168, 1.0),
@@ -84,19 +85,50 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'Welcome to',
               style: TextStyle(
-                  fontSize: 30,
+                  fontFamily: "Alexandria",
+                  fontSize: 24,
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w400),
+                  fontWeight: FontWeight.w300),
             ),
             Text(
               'Corggle',
               style: TextStyle(
+                  fontFamily: "Alexandria",
                   fontSize: 50,
                   color: Theme.of(context).colorScheme.tertiary,
                   fontWeight: FontWeight.w900,
-                  letterSpacing: 8),
+                  letterSpacing: 10),
             ),
+            Text(
+              'Your Personal Talk Companion',
+              style: TextStyle(
+                  fontFamily: "Alexandria",
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w300),
+            ),
+            Spacer(),
             Image.asset('assets/images/home_corgi.png'),
+            Flex(direction: Axis.horizontal, children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  child: Text('はじめる'),
+                ),
+              ),
+              Spacer(),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/register');
+                  },
+                  child: Text('ログイン'),
+                ),
+              ),
+            ]),
+            Spacer(),
           ],
         ),
       ),

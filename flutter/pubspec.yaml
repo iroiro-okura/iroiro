@@ -81,17 +81,46 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
+  fonts:
+    - family: Murecho
+      fonts:
+        - asset: assets/fonts/Murecho/static/Murecho-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Murecho/static/Murecho-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Murecho/static/Murecho-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Murecho/static/Murecho-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Murecho/static/Murecho-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Murecho/static/Murecho-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Murecho/static/Murecho-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Murecho/static/Murecho-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Murecho/static/Murecho-Black.ttf
+          weight: 900
+    - family: Alexandria
+      fonts:
+        - asset: assets/fonts/Alexandria/static/Alexandria-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Alexandria/static/Alexandria-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Alexandria/static/Alexandria-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Alexandria/static/Alexandria-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Alexandria/static/Alexandria-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Alexandria/static/Alexandria-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Alexandria/static/Alexandria-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Alexandria/static/Alexandria-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Alexandria/static/Alexandria-Black.ttf
+          weight: 900
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
