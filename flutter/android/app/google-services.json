@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "347143240742",
+    "project_id": "iroiro-448308",
+    "storage_bucket": "iroiro-448308.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347143240742:android:c945a6e1832fe2b5b83ae7",
+        "android_client_info": {
+          "package_name": "com.example.iroiro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8Cqvq9A3olRsa66MHhFsVncQeNMl-s6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
