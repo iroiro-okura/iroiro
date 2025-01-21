@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+// import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
+  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const MyApp());
 }
 
@@ -107,28 +111,47 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.w300),
             ),
-            Spacer(),
-            Image.asset('assets/images/home_corgi.png'),
-            Flex(direction: Axis.horizontal, children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  child: Text('はじめる'),
-                ),
-              ),
-              Spacer(),
-              Expanded(
-                child: ElevatedButton(
+            Gap(28),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              Image.asset('assets/images/home_corgi.png'),
+            ]),
+            Gap(60),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/register');
                   },
-                  child: Text('ログイン'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                  ),
+                  child: Text(
+                    'はじめる',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
                 ),
-              ),
-            ]),
-            Spacer(),
+                Gap(28),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                  ),
+                  child: Text(
+                    'ログイン',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
