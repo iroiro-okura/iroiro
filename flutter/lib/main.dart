@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:iroiro/components/primary_button.dart';
+import 'package:iroiro/screens/register_screen.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
@@ -119,37 +121,19 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                  ),
-                  child: Text(
-                    'はじめる',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
+                PrimaryButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Register()));
+                    },
+                    buttonTitle: "はじめる"),
                 Gap(28),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                  ),
-                  child: Text(
-                    'ログイン',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
+                PrimaryButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Register()));
+                    },
+                    buttonTitle: "ログイン"),
               ],
             ),
           ],
