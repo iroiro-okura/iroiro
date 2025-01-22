@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:iroiro/components/primary_button%20copy.dart';
+import 'package:iroiro/components/custom_button.dart';
+import 'package:iroiro/components/primary_button.dart';
 import 'package:iroiro/hooks/auth_hook.dart';
 import 'package:iroiro/screens/home_screen.dart';
 
@@ -44,37 +45,9 @@ class Welcome extends StatelessWidget {
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               Image.asset('assets/images/home_corgi.png'),
             ]),
-            Gap(60),
+            Gap(40),
             Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomButton(
-                      onPressed: () async {
-                        await googleSignInHook();
-                        if (context.mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => const Home()),
-                              (route) => false);
-                        }
-                      },
-                      buttonTitle: 'G',
-                      buttonStyle: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(50, 51, 6, 5),
-                        fixedSize: const Size(150, 45),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                        ),
-                      ),
-                      textStyle: const TextStyle(
-                          color: Color.fromRGBO(255, 255, 255, 1),
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800),
-                    ),
-                  ],
-                ),
                 Text(
                   'Googleでログイン',
                   style: TextStyle(
@@ -82,7 +55,29 @@ class Welcome extends StatelessWidget {
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.w300),
-                )
+                ),
+                CustomButton(
+                  onPressed: () async {
+                    await googleSignInHook();
+                    if (context.mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const Home()),
+                          (route) => false);
+                    }
+                  },
+                  buttonTitle: 'G',
+                  buttonStyle: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(50, 51, 6, 5),
+                    fixedSize: const Size(150, 45),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(7)),
+                    ),
+                  ),
+                  textStyle: const TextStyle(
+                      color: Color.fromRGBO(255, 255, 255, 1),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800),
+                ),
               ],
             )
           ],
