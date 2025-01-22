@@ -34,8 +34,8 @@ class MyApp extends StatelessWidget {
               tertiary: Color.fromRGBO(51, 6, 5, 1.0),
               error: Color.fromRGBO(171, 36, 56, 1.0),
               onError: Color.fromRGBO(255, 255, 255, 1),
-              surface: Colors.blueGrey,
-              onSurface: Colors.white)),
+              surface: Color.fromRGBO(216, 216, 168, 1.0),
+              onSurface: Color.fromRGBO(71, 71, 71, 1.0))),
       home: const MyHomePage(title: 'Corggle Home Page'),
     );
   }
