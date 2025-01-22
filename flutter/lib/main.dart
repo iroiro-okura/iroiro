@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:iroiro/components/primary_button.dart';
-import 'package:iroiro/screens/register_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:iroiro/screens/account_screen.dart';
+import 'package:iroiro/screens/chat_screen.dart';
+import 'package:iroiro/screens/home_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -27,11 +27,10 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Murecho',
           colorScheme: const ColorScheme(
               brightness: Brightness.light,
-              primary: Color.fromRGBO(216, 216, 168, 1.0),
+              primary: Color.fromRGBO(234, 141, 80, 1.0),
               onPrimary: Color.fromRGBO(71, 71, 71, 1.0),
-              secondary: Color.fromRGBO(234, 141, 80, 1.0),
+              secondary: Color.fromRGBO(51, 6, 5, 1.0),
               onSecondary: Color.fromRGBO(255, 255, 255, 1),
-              tertiary: Color.fromRGBO(51, 6, 5, 1.0),
               error: Color.fromRGBO(171, 36, 56, 1.0),
               onError: Color.fromRGBO(255, 255, 255, 1),
               surface: Color.fromRGBO(216, 216, 168, 1.0),
@@ -60,95 +59,34 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  static const _screens = [Home(), Chat(), Account()];
 
-  void _incrementCounter() {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Welcome to',
-              style: TextStyle(
-                  fontFamily: "Alexandria",
-                  fontSize: 24,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w300),
-            ),
-            Text(
-              'Corggle',
-              style: TextStyle(
-                  fontFamily: "Alexandria",
-                  fontSize: 50,
-                  color: Theme.of(context).colorScheme.tertiary,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 10),
-            ),
-            Text(
-              'Your Personal Talk Companion',
-              style: TextStyle(
-                  fontFamily: "Alexandria",
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w300),
-            ),
-            Gap(28),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              Image.asset('assets/images/home_corgi.png'),
-            ]),
-            Gap(60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PrimaryButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Register()));
-                    },
-                    buttonTitle: "はじめる"),
-                Gap(28),
-                PrimaryButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Register()));
-                    },
-                    buttonTitle: "ログイン"),
-              ],
-            ),
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.home_filled,
+                ),
+                label: 'ホーム'),
+            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'チャット'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'アカウント'),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+          type: BottomNavigationBarType.fixed,
+        ));
   }
 }
