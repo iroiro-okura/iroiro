@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:iroiro/screens/account_screen.dart';
 import 'package:iroiro/screens/chat_screen.dart';
 import 'package:iroiro/screens/home_screen.dart';
+import 'package:iroiro/screens/welcome_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -35,9 +37,24 @@ class MyApp extends StatelessWidget {
               onError: Color.fromRGBO(255, 255, 255, 1),
               surface: Color.fromRGBO(216, 216, 168, 1.0),
               onSurface: Color.fromRGBO(71, 71, 71, 1.0))),
-      home: const MyHomePage(title: 'Corggle Home Page'),
+      home: _getLandingPage(),
     );
   }
+}
+
+Widget _getLandingPage() {
+  return StreamBuilder<User?>(
+    stream: FirebaseAuth.instance.authStateChanges(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const CircularProgressIndicator();
+      } else if (snapshot.hasData) {
+        return const MyHomePage(title: 'Corggle Home Page');
+      } else {
+        return const Welcome();
+      }
+    },
+  );
 }
 
 class MyHomePage extends StatefulWidget {
