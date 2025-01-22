@@ -28,7 +28,7 @@ class Welcome extends StatelessWidget {
               style: TextStyle(
                   fontFamily: "Alexandria",
                   fontSize: 50,
-                  color: Theme.of(context).colorScheme.tertiary,
+                  color: Theme.of(context).colorScheme.secondary,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 10),
             ),

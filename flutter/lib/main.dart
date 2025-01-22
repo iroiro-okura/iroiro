@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
               onPrimary: Color.fromRGBO(71, 71, 71, 1.0),
               secondary: Color.fromRGBO(51, 6, 5, 1.0),
               onSecondary: Color.fromRGBO(255, 255, 255, 1),
+              tertiary: Color.fromRGBO(229, 229, 183, 1.0),
               error: Color.fromRGBO(171, 36, 56, 1.0),
               onError: Color.fromRGBO(255, 255, 255, 1),
               surface: Color.fromRGBO(216, 216, 168, 1.0),
@@ -49,16 +50,20 @@ Widget _getLandingPage() {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const CircularProgressIndicator();
       } else if (snapshot.hasData) {
-        return const MyHomePage(title: 'Corggle Home Page');
+        return const MyHomePage();
       } else {
-        return const Welcome();
+        return const MyHomePage();
+        // Change this to return const Welcome() once the auth hook is implemented
+        // return const Welcome();
       }
     },
   );
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({
+    super.key,
+  });
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -68,8 +73,6 @@ class MyHomePage extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-
-  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -92,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         body: _screens[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items: const <BottomNavigationBarItem>[
