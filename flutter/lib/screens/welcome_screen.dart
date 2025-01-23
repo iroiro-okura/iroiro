@@ -5,8 +5,35 @@ import 'package:iroiro/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class Welcome extends StatelessWidget {
+class Welcome extends StatefulWidget {
   const Welcome({super.key});
+
+  @override
+  State<Welcome> createState() => _WelcomeState();
+}
+
+class _WelcomeState extends State<Welcome> {
+  bool _isLoading = false;
+
+  Future<void> _handleSignIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sign-in failed: $e')),
+      }
+    );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +76,7 @@ class Welcome extends StatelessWidget {
             Column(
               children: [
                 Text(
-                  'Googleでログイン',
+                  _isLoading ? 'Loading...' : 'Googleでログイン',
                   style: TextStyle(
                       fontFamily: "Alexandria",
                       fontSize: 12,
@@ -57,17 +84,12 @@ class Welcome extends StatelessWidget {
                       fontWeight: FontWeight.w300),
                 ),
                 CustomButton(
-                  onPressed: () async {
-                    await signInWithGoogle();
-                    // if (context.mounted) {
-                    //   Navigator.of(context).pushAndRemoveUntil(
-                    //       MaterialPageRoute(builder: (context) => const Home()),
-                    //       (route) => false);
-                    // }
-                  },
+                  onPressed: _isLoading ? () => {}: _handleSignIn,
                   buttonTitle: 'G',
                   buttonStyle: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(50, 51, 6, 5),
+                    backgroundColor: _isLoading
+                        ? Color.fromARGB(100, 51, 6, 5)
+                        : Color.fromARGB(50, 51, 6, 5),
                     fixedSize: const Size(150, 45),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(7)),
