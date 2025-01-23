@@ -9,7 +9,6 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // TODO: use FutureBuilder
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -46,22 +45,22 @@ class MyApp extends StatelessWidget {
 Widget _getLandingPage() {
   return StreamBuilder<User?>(
     stream: FirebaseAuth.instance.authStateChanges(),
+    initialData: FirebaseAuth.instance.currentUser,
     builder: (context, snapshot) {
+      debugPrint('snapshot: ${snapshot.data}');
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const CircularProgressIndicator();
       } else if (snapshot.hasData) {
-        return const MyHomePage();
+        return const MainPage();
       } else {
-        return const MyHomePage();
-        // Change this to return const Welcome() once the auth hook is implemented
-        // return const Welcome();
+        return const Welcome();
       }
     },
   );
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
+class MainPage extends StatefulWidget {
+  const MainPage({
     super.key,
   });
 
@@ -75,10 +74,10 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainPageState extends State<MainPage> {
   static const _screens = [Home(), Chat(), Account()];
 
   int _selectedIndex = 0;
@@ -99,11 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.home_filled,
-                ),
-                label: 'ホーム'),
+            BottomNavigationBarItem(icon: Icon(Icons.home_filled),label: 'ホーム'),
             BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'チャット'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'アカウント'),
           ],
