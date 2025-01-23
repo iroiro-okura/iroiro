@@ -25,9 +25,8 @@ class _WelcomeState extends State<Welcome> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-in failed: $e')),
+            SnackBar(content: Text('Sign-in failed: $e')));
       }
-    );
     } finally {
       setState(() {
         _isLoading = false;
