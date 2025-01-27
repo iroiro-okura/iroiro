@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:iroiro/components/custom_button.dart';
-import 'package:iroiro/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -24,8 +23,8 @@ class _WelcomeState extends State<Welcome> {
       await signInWithGoogle();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-in failed: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Sign-in failed: $e')));
       }
     } finally {
       setState(() {
@@ -83,7 +82,7 @@ class _WelcomeState extends State<Welcome> {
                       fontWeight: FontWeight.w300),
                 ),
                 CustomButton(
-                  onPressed: _isLoading ? () => {}: _handleSignIn,
+                  onPressed: _isLoading ? () => {} : _handleSignIn,
                   buttonTitle: 'G',
                   buttonStyle: ElevatedButton.styleFrom(
                     backgroundColor: _isLoading
@@ -114,7 +113,7 @@ Future<UserCredential?> signInWithGoogle() async {
 
   // Obtain the auth details from the request
   final GoogleSignInAuthentication? googleAuth =
-  await googleUser?.authentication;
+      await googleUser?.authentication;
 
   // Create a new credential
   final credential = GoogleAuthProvider.credential(

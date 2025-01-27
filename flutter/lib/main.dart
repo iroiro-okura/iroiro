@@ -25,19 +25,36 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Corggle',
       theme: ThemeData(
-          fontFamily: 'Murecho',
-          colorScheme: const ColorScheme(
-              brightness: Brightness.light,
-              primary: Color.fromRGBO(234, 141, 80, 1.0),
-              onPrimary: Color.fromRGBO(71, 71, 71, 1.0),
-              secondary: Color.fromRGBO(51, 6, 5, 1.0),
-              onSecondary: Color.fromRGBO(255, 255, 255, 1),
-              tertiary: Color.fromRGBO(229, 229, 183, 1.0),
-              error: Color.fromRGBO(171, 36, 56, 1.0),
-              onError: Color.fromRGBO(255, 255, 255, 1),
-              surface: Color.fromRGBO(216, 216, 168, 1.0),
-              onSurface: Color.fromRGBO(71, 71, 71, 1.0))),
+        fontFamily: 'Murecho',
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Color.fromRGBO(234, 120, 60, 1.0),
+          onPrimary: Color.fromRGBO(255, 255, 255, 1.0),
+          secondary: Color.fromRGBO(77, 20, 20, 1.0),
+          onSecondary: Color.fromRGBO(255, 255, 255, 1.0),
+          tertiary: Color.fromRGBO(242, 242, 200, 1.0),
+          error: Color.fromRGBO(200, 50, 70, 1.0),
+          onError: Color.fromRGBO(255, 255, 255, 1.0),
+          surface: Color.fromRGBO(245, 245, 220, 1.0),
+          onSurface: Color.fromRGBO(51, 51, 51, 1.0),
+        ),
+      ),
       home: _getLandingPage(),
+      darkTheme: ThemeData(
+        fontFamily: 'Murecho',
+        colorScheme: const ColorScheme(
+          brightness: Brightness.dark,
+          primary: Color.fromRGBO(234, 141, 80, 1.0),
+          onPrimary: Color.fromRGBO(255, 255, 255, 1.0),
+          secondary: Color.fromRGBO(229, 229, 183, 1.0),
+          onSecondary: Color.fromRGBO(51, 6, 5, 1.0),
+          tertiary: Color.fromRGBO(71, 71, 71, 1.0),
+          error: Color.fromRGBO(255, 105, 97, 1.0),
+          onError: Color.fromRGBO(0, 0, 0, 1.0),
+          surface: Color.fromRGBO(51, 51, 51, 1.0),
+          onSurface: Color.fromRGBO(229, 229, 183, 1.0),
+        ), //
+      ),
     );
   }
 }
@@ -98,7 +115,8 @@ class _MainPageState extends State<MainPage> {
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home_filled),label: 'ホーム'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_filled), label: 'ホーム'),
             BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'チャット'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'アカウント'),
           ],
