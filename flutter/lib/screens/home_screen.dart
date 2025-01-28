@@ -103,7 +103,7 @@ class Home extends StatelessWidget {
                                 ),
                               ],
                               image: DecorationImage(
-                                image: AssetImage('assets/images/dating.jpeg'),
+                                image: AssetImage('assets/images/dating.png'),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -153,7 +153,7 @@ class Home extends StatelessWidget {
                                 ),
                               ],
                               image: DecorationImage(
-                                image: AssetImage('assets/images/dating.jpeg'),
+                                image: AssetImage('assets/images/welcome_party.jpeg'),
                                 fit: BoxFit.cover,
                               ),
                             ),
