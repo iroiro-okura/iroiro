@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:iroiro/firebase/firestore.dart';
+import 'package:iroiro/model/user.dart' as model;
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -8,7 +10,9 @@ class AuthService {
 
   AuthService._internal();
 
-  static Future<UserCredential?> signIn() async {
+  static final auth = FirebaseAuth.instance;
+
+  static Future<void> signIn() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -22,8 +26,9 @@ class AuthService {
       idToken: googleAuth?.idToken,
     );
 
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    await auth.signInWithCredential(credential);
+    FirestoreService.registerUser();
+
   }
 
   static Future<void> signOut() async {

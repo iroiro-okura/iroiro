@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:iroiro/components/custom_button.dart';
 import 'package:iroiro/firebase/auth.dart';
-import 'package:iroiro/firebase/firestore.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -32,7 +31,6 @@ class _WelcomeState extends State<Welcome> {
       });
     }
 
-    await FirestoreService.registerUser();
   }
 
   @override

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:logger/logger.dart';
+import 'package:iroiro/firebase/auth.dart';
+import 'package:iroiro/model/user.dart' as model;
 
 var logger = Logger();
 
@@ -14,13 +15,27 @@ class FirestoreService {
 
   static final db = FirebaseFirestore.instance;
 
+  static Future<model.User?> getUser() async {
+    User? authUser = AuthService.auth.currentUser;
+    if (authUser == null) {
+      return null;
+    }
+    logger.i('Getting user ${authUser.uid}');
+    var doc = await db.collection('users').doc(authUser.uid).get();
+    if (doc.exists) {
+      return model.User.fromSnapshot(authUser.uid, doc);
+    }
+    return null;
+  }
+
   static Future<void> registerUser() async {
-    var user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      logger.i('Registering user $user');
-      await db.collection('users').doc(user.uid).set({
-        'email': user.email,
-        'name': user.displayName,
+    User? authUser = AuthService.auth.currentUser;
+    model.User? user = authUser != null ? await getUser() : null;
+    if (authUser != null && user == null) {
+      logger.i('Registering user ${authUser.uid}');
+      await db.collection('users').doc(authUser.uid).set({
+        'email': authUser.email,
+        'name': authUser.displayName,
       });
     }
   }
