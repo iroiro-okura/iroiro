@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iroiro/firebase/auth.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -9,6 +11,10 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+  String _username = 'コギ太郎';
+  String _gender = '';
+  int _age = 0;
+  String _occupation = '';
   bool _isLoading = false;
 
   Future<void> _handleSignOut() async {
@@ -25,31 +31,169 @@ class _AccountState extends State<Account> {
     }
   }
 
+  void _editProfile() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController usernameController =
+            TextEditingController(text: _username);
+        final TextEditingController genderController =
+            TextEditingController(text: _gender);
+        final TextEditingController ageController =
+            TextEditingController(text: _age == 0 ? '' : _age.toString());
+        final TextEditingController occupationController =
+            TextEditingController(text: _occupation);
+
+        return AlertDialog(
+          title: const Text('Edit Profile'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                ),
+                TextField(
+                  controller: genderController,
+                  decoration: const InputDecoration(labelText: 'Gender'),
+                ),
+                TextField(
+                  controller: ageController,
+                  decoration: const InputDecoration(labelText: 'Age'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: occupationController,
+                  decoration: const InputDecoration(labelText: 'Occupation'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                setState(() {
+                  _username = usernameController.text;
+                  _gender = genderController.text;
+                  _age = int.tryParse(ageController.text) ?? _age;
+                  _occupation = occupationController.text;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Account',
-              style: TextStyle(
-                fontSize: 24,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _handleSignOut,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isLoading
-                    ? Color.fromARGB(100, 51, 6, 5) // Darker color when loading
-                    : Color.fromARGB(50, 51, 6, 5), // Original color
-              ),
-              child: _isLoading ? CircularProgressIndicator() : const Text('Sign Out'),
-            ),
-          ],
+        appBar: AppBar(
+          title: const Text('Corggle'),
+          titleTextStyle: TextStyle(
+            fontFamily: 'Alexandria',
+            fontSize: 20,
+            color: Theme.of(context).colorScheme.secondary,
+            fontWeight: FontWeight.w500,
+          ),
+          titleSpacing: 0,
+          leading: IconButton(
+            padding: const EdgeInsets.all(11),
+            onPressed: null,
+            icon: Image.asset('assets/icon/icon_transparent.png'),
+          ),
         ),
-      ),
-    );
+        body: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                const SizedBox(height: 20),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.transparent,
+                  child: SvgPicture.string(
+                    RandomAvatarString(_username),
+                    width: 100,
+                    height: 100,
+                  ),
+                ),
+                Text(
+                  _username,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Card(
+                  elevation: 2,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('性別: $_gender'),
+                  ),
+                ),
+                Card(
+                  elevation: 2,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                  child: ListTile(
+                    leading: Icon(Icons.cake),
+                    title: Text('年齢: $_age'),
+                  ),
+                ),
+                Card(
+                  elevation: 2,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                  child: ListTile(
+                    leading: Icon(Icons.work),
+                    title: Text('職業: $_occupation'),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _editProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
+                  child: Text('編集する'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _handleSignOut,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        _isLoading ? Colors.brown[100] : Colors.brown,
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : const Text('サインアウト'),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }

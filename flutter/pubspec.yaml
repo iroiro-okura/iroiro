@@ -44,6 +44,8 @@ dependencies:
   persistent_bottom_nav_bar: ^6.2.1
   provider: ^6.1.2
   logger: ^2.5.0
+  random_avatar: ^0.0.8
+  flutter_svg: ^2.0.17
 
 flutter_icons:
   android: true

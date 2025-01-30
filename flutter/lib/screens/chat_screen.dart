@@ -10,6 +10,21 @@ class Chat extends StatelessWidget {
     final argument = Provider.of<ChatArgumentsProvider>(context).argument;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Corggle'),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Alexandria',
+          fontSize: 20,
+          color: Theme.of(context).colorScheme.secondary,
+          fontWeight: FontWeight.w500,
+        ),
+        titleSpacing: 0,
+        leading: IconButton(
+          padding: const EdgeInsets.all(11),
+          onPressed: null,
+          icon: Image.asset('assets/icon/icon_transparent.png'),
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
