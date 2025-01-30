@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:iroiro/components/custom_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:iroiro/firebase/auth.dart';
+import 'package:iroiro/firebase/firestore.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -20,7 +20,7 @@ class _WelcomeState extends State<Welcome> {
     });
 
     try {
-      await signInWithGoogle();
+      await AuthService.signIn();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -31,6 +31,8 @@ class _WelcomeState extends State<Welcome> {
         _isLoading = false;
       });
     }
+
+    await FirestoreService.registerUser();
   }
 
   @override
@@ -107,20 +109,3 @@ class _WelcomeState extends State<Welcome> {
   }
 }
 
-Future<UserCredential?> signInWithGoogle() async {
-  // Trigger the authentication flow
-  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-  // Obtain the auth details from the request
-  final GoogleSignInAuthentication? googleAuth =
-      await googleUser?.authentication;
-
-  // Create a new credential
-  final credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth?.accessToken,
-    idToken: googleAuth?.idToken,
-  );
-
-  // Once signed in, return the UserCredential
-  return await FirebaseAuth.instance.signInWithCredential(credential);
-}

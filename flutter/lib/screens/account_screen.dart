@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:iroiro/firebase/auth.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -18,7 +17,7 @@ class _AccountState extends State<Account> {
     });
 
     try {
-      await googleSignOut();
+      await AuthService.signOut();
     } finally {
       setState(() {
         _isLoading = false;
@@ -53,9 +52,4 @@ class _AccountState extends State<Account> {
       ),
     );
   }
-}
-
-Future<void> googleSignOut() async {
-  await GoogleSignIn().signOut();
-  await FirebaseAuth.instance.signOut();
 }
