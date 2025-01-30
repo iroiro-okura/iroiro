@@ -13,7 +13,7 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  String _username = 'コギ太郎';
+  String _username = '';
   String _gender = '';
   int _age = 0;
   String _occupation = '';
@@ -81,12 +81,12 @@ class _AccountState extends State<Account> {
       builder: (BuildContext context) {
         final TextEditingController usernameController =
             TextEditingController(text: _username);
-        final TextEditingController genderController =
-            TextEditingController(text: _gender);
+
         final TextEditingController ageController =
             TextEditingController(text: _age == 0 ? '' : _age.toString());
         final TextEditingController occupationController =
             TextEditingController(text: _occupation);
+        String gender = _gender;
 
         return AlertDialog(
           title: const Text('Edit Profile'),
@@ -97,9 +97,23 @@ class _AccountState extends State<Account> {
                   controller: usernameController,
                   decoration: const InputDecoration(labelText: 'Username'),
                 ),
-                TextField(
-                  controller: genderController,
+                DropdownButtonFormField<Sex>(
+                  value: gender.isNotEmpty
+                      ? Sex.values.firstWhere(
+                          (e) => e.toString().split('.').last == gender)
+                      : null,
                   decoration: const InputDecoration(labelText: 'Gender'),
+                  items: Sex.values
+                      .map((label) => DropdownMenuItem(
+                            child: Text(label.toString().split('.').last),
+                            value: label,
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      gender = value?.toString().split('.').last ?? '';
+                    });
+                  },
                 ),
                 TextField(
                   controller: ageController,
@@ -125,7 +139,7 @@ class _AccountState extends State<Account> {
               onPressed: () async {
                 setState(() {
                   _username = usernameController.text;
-                  _gender = genderController.text;
+                  _gender = gender;
                   _age = int.tryParse(ageController.text) ?? _age;
                   _occupation = occupationController.text;
                 });
