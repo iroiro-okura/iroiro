@@ -5,14 +5,14 @@ class User {
     required this.email,
     required this.name,
     this.age,
-    this.sex,
+    this.gender,
     this.occupation,
   });
 
   final String email;
   final String name;
   final int? age;
-  final Sex? sex;
+  final Sex? gender;
   final String? occupation;
 
   factory User.fromSnapshot(String uid, DocumentSnapshot snapshot) {
@@ -21,7 +21,7 @@ class User {
       email: data['email'] as String,
       name: data['name'] as String,
       age: data['age'] as int?,
-      sex: data['sex'] != null ? Sex.values[data['sex'] as int] : null,
+      gender: data['sex'] != null ? Sex.values[data['sex'] as int] : null,
       occupation: data['occupation'] as String?,
     );
   }
