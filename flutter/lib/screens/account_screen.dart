@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iroiro/firebase/auth.dart';
+import 'package:iroiro/firebase/firestore.dart';
+import 'package:iroiro/model/user.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 class Account extends StatefulWidget {
@@ -17,6 +19,29 @@ class _AccountState extends State<Account> {
   String _occupation = '';
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final user = AuthService.auth.currentUser;
+    if (user != null) {
+      final userProfile = await FirestoreService.getUser();
+      if (userProfile != null) {
+        setState(() {
+          _username = userProfile.name;
+          _gender = userProfile.gender != null
+              ? userProfile.gender.toString().split('.').last
+              : '';
+          _age = userProfile.age ?? 0;
+          _occupation = userProfile.occupation ?? '';
+        });
+      }
+    }
+  }
+
   Future<void> _handleSignOut() async {
     setState(() {
       _isLoading = true;
@@ -28,6 +53,25 @@ class _AccountState extends State<Account> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _updateUserProfile(
+      String username, String gender, int age, String occupation) async {
+    final user = AuthService.auth.currentUser;
+    if (user != null) {
+      final updatedUser = User(
+        uid: user.uid,
+        email: user.email!,
+        name: username,
+        gender: gender.isNotEmpty
+            ? Sex.values
+                .firstWhere((e) => e.toString().split('.').last == gender)
+            : null,
+        age: age,
+        occupation: occupation,
+      );
+      await FirestoreService.updateUser(updatedUser);
     }
   }
 
@@ -78,14 +122,17 @@ class _AccountState extends State<Account> {
             ),
             TextButton(
               child: const Text('Save'),
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
                   _username = usernameController.text;
                   _gender = genderController.text;
                   _age = int.tryParse(ageController.text) ?? _age;
                   _occupation = occupationController.text;
                 });
-                Navigator.of(context).pop();
+                await _updateUserProfile(_username, _gender, _age, _occupation);
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
               },
             ),
           ],
@@ -150,7 +197,7 @@ class _AccountState extends State<Account> {
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
                   child: ListTile(
                     leading: Icon(Icons.cake),
-                    title: Text('年齢: $_age'),
+                    title: Text('年齢: ${_age == 0 ? '' : _age}'),
                   ),
                 ),
                 Card(
