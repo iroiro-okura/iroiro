@@ -24,7 +24,7 @@ class User {
       email: data['email'] as String,
       name: data['name'] as String,
       age: data['age'] as int?,
-      gender: data['sex'] != null ? Sex.values[data['sex'] as int] : null,
+      gender: data['gender'] != null ? Sex.values[data['gender'] as int] : null,
       occupation: data['occupation'] as String?,
     );
   }
