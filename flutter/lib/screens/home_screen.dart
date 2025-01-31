@@ -27,7 +27,8 @@ class Home extends StatelessWidget {
             icon: Image.asset('assets/icon/icon_transparent.png'),
           ),
         ),
-        body: Column(
+        body: Expanded(
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Gap(20),
@@ -200,6 +201,6 @@ class Home extends StatelessWidget {
               ),
             )
           ],
-        ));
+        )));
   }
 }
