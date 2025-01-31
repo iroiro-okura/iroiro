@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => ChatArgumentsProvider())
         ],
         child: MaterialApp(
           title: 'Corggle',
