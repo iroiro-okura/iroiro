@@ -23,6 +23,10 @@ class _ChatState extends State<Chat> {
       'text':
           'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は『はじめてのデート』で話題を探しているんだね。\n最適な話題を見つけるためにも、お相手のことをもう少し教えてほしいな！'
     });
+
+    _controller.addListener(() {
+      setState(() {});
+    });
   }
 
   void _sendMessage() {
@@ -129,7 +133,10 @@ class _ChatState extends State<Chat> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send),
+                  icon: Icon(
+                      Icons.send,
+                      color: _controller.text.isEmpty ? Colors.grey : Colors.blue,
+                  ),
                   onPressed: _sendMessage,
                 ),
               ],
