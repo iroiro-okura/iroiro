@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:iroiro/main.dart';
+import 'package:iroiro/providers/chat_provider.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -99,7 +99,7 @@ class Home extends StatelessWidget {
                         children: [
                           InkWell(
                               onTap: () {
-                                Provider.of<ChatArgumentsProvider>(context,
+                                Provider.of<ChatProvider>(context,
                                         listen: false)
                                     .setArgument('初めてのデート');
                                 controller.jumpToTab(1);
@@ -132,8 +132,7 @@ class Home extends StatelessWidget {
                         children: [
                           InkWell(
                             onTap: () {
-                              Provider.of<ChatArgumentsProvider>(context,
-                                      listen: false)
+                              Provider.of<ChatProvider>(context, listen: false)
                                   .setArgument('同窓会');
                               controller.jumpToTab(1);
                             },
@@ -166,7 +165,7 @@ class Home extends StatelessWidget {
                         children: [
                           InkWell(
                               onTap: () {
-                                Provider.of<ChatArgumentsProvider>(context,
+                                Provider.of<ChatProvider>(context,
                                         listen: false)
                                     .setArgument('会社の懇親会');
                                 controller.jumpToTab(1);

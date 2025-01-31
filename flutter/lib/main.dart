@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:iroiro/firebase/auth.dart';
 import 'package:iroiro/firebase/firestore.dart';
+import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
 import 'package:iroiro/screens/account_screen.dart';
 import 'package:iroiro/screens/chat_screen.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
-          ChangeNotifierProvider(create: (_) => ChatArgumentsProvider())
+          ChangeNotifierProvider(create: (_) => ChatProvider())
         ],
         child: MaterialApp(
           title: 'Corggle',
@@ -121,8 +122,7 @@ class _MainPageState extends State<MainPage> {
 
     _controller.addListener(() {
       if (_controller.index == 0) {
-        Provider.of<ChatArgumentsProvider>(context, listen: false)
-            .resetArgument();
+        Provider.of<ChatProvider>(context, listen: false).resetArgument();
       }
     });
   }
@@ -183,21 +183,5 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
     );
-  }
-}
-
-class ChatArgumentsProvider with ChangeNotifier {
-  String _argument = '';
-
-  String get argument => _argument;
-
-  void setArgument(String argument) {
-    _argument = argument;
-    notifyListeners();
-  }
-
-  void resetArgument() {
-    _argument = '';
-    notifyListeners();
   }
 }
