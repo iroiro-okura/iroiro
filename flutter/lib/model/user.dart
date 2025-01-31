@@ -14,7 +14,7 @@ class User {
   final String email;
   final String name;
   final int? age;
-  final Sex? gender;
+  final Gender? gender;
   final String? occupation;
 
   factory User.fromSnapshot(String uid, DocumentSnapshot snapshot) {
@@ -24,14 +24,14 @@ class User {
       email: data['email'] as String,
       name: data['name'] as String,
       age: data['age'] as int?,
-      gender: data['gender'] != null ? Sex.values[data['gender'] as int] : null,
+      gender: data['gender'] != null ? Gender.values[data['gender'] as int] : null,
       occupation: data['occupation'] as String?,
     );
   }
 
 }
 
-enum Sex {
+enum Gender {
   male,
   female,
   other,

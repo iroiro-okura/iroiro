@@ -58,7 +58,7 @@ class _AccountState extends State<Account> {
         email: user.email!,
         name: username,
         gender: gender.isNotEmpty
-            ? Sex.values
+            ? Gender.values
                 .firstWhere((e) => e.toString().split('.').last == gender)
             : null,
         age: age,
@@ -91,13 +91,13 @@ class _AccountState extends State<Account> {
                   controller: usernameController,
                   decoration: const InputDecoration(labelText: 'Username'),
                 ),
-                DropdownButtonFormField<Sex>(
+                DropdownButtonFormField<Gender>(
                   value: gender.isNotEmpty
-                      ? Sex.values.firstWhere(
+                      ? Gender.values.firstWhere(
                           (e) => e.toString().split('.').last == gender)
                       : null,
                   decoration: const InputDecoration(labelText: 'Gender'),
-                  items: Sex.values
+                  items: Gender.values
                       .map((label) => DropdownMenuItem(
                             value: label,
                             child: Text(label.toString().split('.').last),
