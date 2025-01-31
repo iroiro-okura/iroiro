@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:iroiro/firebase/auth.dart';
+import 'package:iroiro/firebase/firestore.dart';
+import 'package:iroiro/providers/user_provider.dart';
 import 'package:iroiro/screens/account_screen.dart';
 import 'package:iroiro/screens/chat_screen.dart';
 import 'package:iroiro/screens/home_screen.dart';
@@ -24,8 +27,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (_) => ChatArgumentsProvider(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+        ],
         child: MaterialApp(
           title: 'Corggle',
           routes: {
@@ -109,6 +114,8 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    _loadUserProfile();
+
     _screens = [Home(controller: _controller), Chat(), Account()];
 
     _controller.addListener(() {
@@ -117,6 +124,17 @@ class _MainPageState extends State<MainPage> {
             .resetArgument();
       }
     });
+  }
+
+  Future<void> _loadUserProfile() async {
+    final user = AuthService.auth.currentUser;
+    if (user != null) {
+      final userProfile = await FirestoreService.getUser();
+      if (!mounted) return;
+      if (userProfile != null) {
+        Provider.of<UserProvider>(context, listen: false).setUser(userProfile);
+      }
+    }
   }
 
   late final List<Widget> _screens;
