@@ -3,6 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:iroiro/firebase/auth.dart';
 import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/model/user.dart';
+import 'package:iroiro/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 class Account extends StatefulWidget {
@@ -20,25 +22,16 @@ class _AccountState extends State<Account> {
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    final user = AuthService.auth.currentUser;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final user = Provider.of<UserProvider>(context).user;
     if (user != null) {
-      final userProfile = await FirestoreService.getUser();
-      if (userProfile != null) {
-        setState(() {
-          _username = userProfile.name;
-          _gender = userProfile.gender != null
-              ? userProfile.gender.toString().split('.').last
-              : '';
-          _age = userProfile.age ?? 0;
-          _occupation = userProfile.occupation ?? '';
-        });
-      }
+      setState(() {
+        _username = user.name;
+        _gender = user.gender?.toString().split('.').last ?? '';
+        _age = user.age ?? 0;
+        _occupation = user.occupation ?? '';
+      });
     }
   }
 
@@ -92,6 +85,7 @@ class _AccountState extends State<Account> {
           title: const Text('Edit Profile'),
           content: SingleChildScrollView(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
                   controller: usernameController,
@@ -105,8 +99,8 @@ class _AccountState extends State<Account> {
                   decoration: const InputDecoration(labelText: 'Gender'),
                   items: Sex.values
                       .map((label) => DropdownMenuItem(
-                            child: Text(label.toString().split('.').last),
                             value: label,
+                            child: Text(label.toString().split('.').last),
                           ))
                       .toList(),
                   onChanged: (value) {
@@ -158,103 +152,108 @@ class _AccountState extends State<Account> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Corggle'),
-          titleTextStyle: TextStyle(
-            fontFamily: 'Alexandria',
-            fontSize: 20,
-            color: Theme.of(context).colorScheme.secondary,
-            fontWeight: FontWeight.w500,
-          ),
-          titleSpacing: 0,
-          leading: IconButton(
-            padding: const EdgeInsets.all(11),
-            onPressed: null,
-            icon: Image.asset('assets/icon/icon_transparent.png'),
-          ),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Corggle'),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Alexandria',
+          fontSize: 20,
+          color: Theme.of(context).colorScheme.secondary,
+          fontWeight: FontWeight.w500,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const SizedBox(height: 20),
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.transparent,
-                  child: SvgPicture.string(
-                    RandomAvatarString(_username),
-                    width: 100,
-                    height: 100,
-                  ),
+        titleSpacing: 0,
+        leading: IconButton(
+          padding: const EdgeInsets.all(11),
+          onPressed: null,
+          icon: Image.asset('assets/icon/icon_transparent.png'),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: SingleChildScrollView(
+            child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 20),
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.transparent,
+                child: SvgPicture.string(
+                  RandomAvatarString(_username),
+                  width: 100,
+                  height: 100,
                 ),
-                Text(
-                  _username,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
+              ),
+              Text(
+                _username,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              if (_gender.isNotEmpty)
                 Card(
                   elevation: 2,
                   margin:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                   child: ListTile(
                     leading: Icon(Icons.person),
                     title: Text('性別: $_gender'),
                   ),
                 ),
+              if (_age != 0)
                 Card(
                   elevation: 2,
                   margin:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                   child: ListTile(
                     leading: Icon(Icons.cake),
-                    title: Text('年齢: ${_age == 0 ? '' : _age}'),
+                    title: Text('年齢: $_age'),
                   ),
                 ),
+              if (_occupation.isNotEmpty)
                 Card(
                   elevation: 2,
                   margin:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                   child: ListTile(
                     leading: Icon(Icons.work),
                     title: Text('職業: $_occupation'),
                   ),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _editProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: Text('編集する'),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _editProfile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSignOut,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        _isLoading ? Colors.brown[100] : Colors.brown,
-                    foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: _isLoading
-                      ? CircularProgressIndicator()
-                      : const Text('サインアウト'),
+                child: Text('編集する'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _handleSignOut,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      _isLoading ? Colors.brown[100] : Colors.brown,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
                 ),
-              ],
-            ),
+                child: _isLoading
+                    ? CircularProgressIndicator()
+                    : const Text('サインアウト'),
+              ),
+            ],
           ),
-        ));
+        )),
+      ),
+    );
   }
 }
