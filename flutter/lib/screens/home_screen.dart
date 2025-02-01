@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/providers/chat_provider.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
@@ -12,21 +13,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Corggle'),
-          titleTextStyle: TextStyle(
-            fontFamily: 'Alexandria',
-            fontSize: 20,
-            color: Theme.of(context).colorScheme.secondary,
-            fontWeight: FontWeight.w500,
-          ),
-          titleSpacing: 0,
-          leading: IconButton(
-            padding: const EdgeInsets.all(11),
-            onPressed: null,
-            icon: Image.asset('assets/icon/icon_transparent.png'),
-          ),
-        ),
+        appBar: CorggleAppBar(),
         body: Expanded(
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
