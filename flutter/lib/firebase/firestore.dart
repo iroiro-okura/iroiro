@@ -91,13 +91,16 @@ class FirestoreService {
       'createdAt': now,
     });
 
-    // Save the initial message to the messages sub-collection
-    await db.collection('chats').doc(docRef.id).collection('messages').add({
-      'sender': 'corggle',
-      'text': initialMessage,
-      'status': 'sent',
-      'sentAt': now,
-    });
+    // Create a Message object
+    Message message = Message(
+      sender: Sender.corggle,
+      text: initialMessage,
+      status: Status.sent,
+      sentAt: now,
+    );
+
+    // Use the sendMessage function to save the initial message
+    await sendMessage(docRef.id, message);
   }
 
   static Future<void> sendMessage(String chatId, Message message) async {
@@ -111,12 +114,13 @@ class FirestoreService {
 
   static Future<Chat?> getChat(String chatId) async {
     logger.i('Getting chat $chatId');
-    await db.collection('chats').doc(chatId).get().then((snapshot) async {
+    return await db.collection('chats').doc(chatId).get().then((snapshot) async {
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>;
         var chat = Chat.fromJson(chatId, data);
         var messages = await getMessages(chatId);
         chat.messages = messages ?? [];
+        return chat;
       } else {
         logger.w('Chat $chatId does not exist');
         return null;
@@ -132,13 +136,10 @@ class FirestoreService {
     }).toList();
   }
 
-  static listenToMessages(String chatId, void Function(List<Message>) callback) {
+  static Stream<List<Message>> messageStream(String chatId) {
     logger.i('Listening to messages for chat $chatId');
-    db.collection('chats').doc(chatId).collection('messages').snapshots().listen((snapshot) {
-      List<Message> messages = snapshot.docs.map((doc) {
-        return Message.fromJson(doc.data());
-      }).toList();
-      callback(messages);
+    return db.collection('chats').doc(chatId).collection('messages').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => Message.fromJson(doc.data())).toList();
     });
   }
 }
