@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iroiro/model/chat.dart';
 import 'package:logger/logger.dart';
 import 'package:iroiro/firebase/auth.dart';
 import 'package:iroiro/model/user.dart' as model;
@@ -15,29 +16,31 @@ class FirestoreService {
 
   static final db = FirebaseFirestore.instance;
 
-  static Future<model.User?> getUser() async {
-    User? authUser = AuthService.auth.currentUser;
-    if (authUser == null) {
-      return null;
+  static User _getAuthUser() {
+    User? user = AuthService.auth.currentUser;
+    if (user == null) {
+      throw Exception('User not signed in');
     }
+    return user;
+  }
+
+  static Future<model.User?> getUser() async {
+    User authUser = _getAuthUser();
     logger.i('Getting user ${authUser.uid}');
     var doc = await db.collection('users').doc(authUser.uid).get();
-    if (doc.exists) {
-      return model.User.fromSnapshot(authUser.uid, doc);
+    var data = doc.data();
+    if (doc.exists && data != null) {
+      return model.User.fromJson(authUser.uid, data);
     }
     return null;
   }
 
   static Future<void> updateUser(model.User user) async {
-    User? authUser = AuthService.auth.currentUser;
-    if (authUser == null) {
-      return;
+    User authUser = _getAuthUser();
+    model.User? existingUser = await getUser();
+    if (existingUser == null) {
+      throw Exception('User not found');
     }
-    var existingUserDoc = await db.collection('users').doc(authUser.uid).get();
-    if (!existingUserDoc.exists) {
-      return;
-    }
-    model.User existingUser = model.User.fromSnapshot(authUser.uid, existingUserDoc);
     // Create a map to hold the updated fields
     Map<String, dynamic> updatedFields = {};
 
@@ -66,9 +69,9 @@ class FirestoreService {
   }
 
   static Future<void> registerUser() async {
-    User? authUser = AuthService.auth.currentUser;
-    model.User? user = authUser != null ? await getUser() : null;
-    if (authUser != null && user == null) {
+    User authUser = _getAuthUser();
+    model.User? user = await getUser();
+    if (user == null) {
       logger.i('Registering user ${authUser.uid}');
       await db.collection('users').doc(authUser.uid).set({
         'email': authUser.email,
@@ -76,4 +79,46 @@ class FirestoreService {
       });
     }
   }
+
+  static Future<void> createChat(Chat chat) async {
+    logger.i('Creating chat $chat');
+    await db.collection('chats').doc(chat.chatId).set({
+      'userId': chat.userId,
+      'topic': chat.topic,
+      'createdAt': chat.createdAt,
+    });
+  }
+
+  static Future<void> sendMessage(String chatId, Message message) async {
+    logger.i('Sending message $message to chat $chatId');
+    await db.collection('chats').doc(chatId).collection('messages').add({
+      'sender': message.sender == Sender.corggle ? 'corggle' : 'user',
+      'text': message.text,
+      'sentAt': message.sentAt,
+    });
+  }
+
+  static Future<Chat?> getChat(String chatId) async {
+    logger.i('Getting chat $chatId');
+    await db.collection('chats').doc(chatId).get().then((snapshot) async {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        var chat = Chat.fromJson(chatId, data);
+        var messages = await getMessages(chatId);
+        chat.messages = messages ?? [];
+      } else {
+        logger.w('Chat $chatId does not exist');
+        return null;
+      }
+    });
+  }
+
+  static Future<List<Message>?> getMessages(String chatId) async {
+    logger.i('Getting messages for chat $chatId');
+    var querySnapshot = await db.collection('chats').doc(chatId).collection('messages').get();
+    return querySnapshot.docs.map((doc) {
+      return Message.fromJson(doc.data());
+    }).toList();
+  }
+
 }

@@ -17,8 +17,7 @@ class User {
   final Gender? gender;
   final String? occupation;
 
-  factory User.fromSnapshot(String uid, DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  factory User.fromJson(String uid, Map<String, dynamic> data) {
     return User(
       uid: uid,
       email: data['email'] as String,
@@ -28,7 +27,6 @@ class User {
       occupation: data['occupation'] as String?,
     );
   }
-
 }
 
 enum Gender {

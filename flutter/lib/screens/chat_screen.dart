@@ -19,7 +19,7 @@ class _ChatState extends State<Chat> {
   void initState() {
     super.initState();
     _messages.add({
-      'sender': 'gemini',
+      'sender': 'corggle',
       'text':
           'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は『はじめてのデート』で話題を探しているんだね。\n最適な話題を見つけるためにも、お相手のことをもう少し教えてほしいな！'
     });
@@ -39,7 +39,7 @@ class _ChatState extends State<Chat> {
       Future.delayed(Duration(seconds: 1), () {
         setState(() {
           _messages.add({
-            'sender': 'gemini',
+            'sender': 'corggle',
             'text': 'This is a response from Gemini API'
           });
         });
