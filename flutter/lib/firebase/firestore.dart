@@ -80,12 +80,23 @@ class FirestoreService {
     }
   }
 
-  static Future<void> createChat(Chat chat) async {
-    logger.i('Creating chat $chat');
-    await db.collection('chats').doc(chat.chatId).set({
-      'userId': chat.userId,
-      'topic': chat.topic,
-      'createdAt': chat.createdAt,
+  static Future<void> createChat(String userId, String topic, String initialMessage) async {
+    logger.i('Creating chat for user $userId with topic $topic');
+
+    DateTime now = DateTime.now();
+    // Save the chat to Firestore
+    var docRef = await db.collection('chats').add({
+      'userId': userId,
+      'topic': topic,
+      'createdAt': now,
+    });
+
+    // Save the initial message to the messages sub-collection
+    await db.collection('chats').doc(docRef.id).collection('messages').add({
+      'sender': 'corggle',
+      'text': initialMessage,
+      'status': 'sent',
+      'sentAt': now,
     });
   }
 
@@ -121,4 +132,13 @@ class FirestoreService {
     }).toList();
   }
 
+  static listenToMessages(String chatId, void Function(List<Message>) callback) {
+    logger.i('Listening to messages for chat $chatId');
+    db.collection('chats').doc(chatId).collection('messages').snapshots().listen((snapshot) {
+      List<Message> messages = snapshot.docs.map((doc) {
+        return Message.fromJson(doc.data());
+      }).toList();
+      callback(messages);
+    });
+  }
 }

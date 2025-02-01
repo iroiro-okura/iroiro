@@ -23,17 +23,25 @@ class Chat {
 class Message {
   final Sender sender;
   final String text;
+  final Status status;
   final DateTime sentAt;
 
-  Message({required this.sender, required this.text, required this.sentAt});
+  Message({required this.sender, required this.text, required this.status, required this.sentAt});
 
   factory Message.fromJson(Map<String, dynamic> data) {
     return Message(
       sender: data['sender'] == 'corggle' ? Sender.corggle : Sender.user,
       text: data['text'] as String,
+      status: Status.values.firstWhere((e) => e.toString() == 'Status.${data['status']}'),
       sentAt: (data['sentAt'] as Timestamp).toDate(),
     );
   }
+}
+
+enum Status {
+  inProgress,
+  failed,
+  sent,
 }
 
 enum Sender {
