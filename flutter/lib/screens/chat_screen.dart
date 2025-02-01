@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iroiro/components/app_bar.dart';
+import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class _ChatState extends State<Chat> {
   final List<Map<String, String>> _messages = [];
   final TextEditingController _controller = TextEditingController();
   late final String chatArgument;
+  bool _isFirstMessage = true;
 
   @override
   void initState() {
@@ -24,8 +26,9 @@ class _ChatState extends State<Chat> {
     chatArgument = Provider.of<ChatProvider>(context, listen: false).argument;
     _messages.add({
       'sender': 'corggle',
-      'text':
-          'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は『$chatArgument』で話題を探しているんだね。\n最適な話題を見つけるためにも、お相手のことをもう少し教えてほしいな！'
+      'text': chatArgument.isEmpty
+          ? 'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は話題を探しているんだね。\n最適な話題を見つけるためにも、シチュエーションとお相手について教えてほしいな！'
+          : 'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は『$chatArgument』で話題を探しているんだね。\n最適な話題を見つけるためにも、お相手のことをもう少し教えてほしいな！'
     });
 
     _controller.addListener(() {
@@ -35,6 +38,13 @@ class _ChatState extends State<Chat> {
 
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
+      if (_isFirstMessage) {
+        FirestoreService.createChat(
+            Provider.of<UserProvider>(context, listen: false).user!.uid,
+            chatArgument,
+            _controller.text);
+        _isFirstMessage = false;
+      }
       setState(() {
         _messages.add({'sender': 'user', 'text': _controller.text});
         _controller.clear();

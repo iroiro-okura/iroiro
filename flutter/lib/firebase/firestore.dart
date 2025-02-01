@@ -80,13 +80,13 @@ class FirestoreService {
     }
   }
 
-  static Future<void> createChat(String userId, String topic, String initialMessage) async {
-    logger.i('Creating chat for user $userId with topic $topic');
+  static Future<void> createChat(String uid, String topic, String initialMessage) async {
+    logger.i('Creating chat for user $uid with topic $topic');
 
     DateTime now = DateTime.now();
     // Save the chat to Firestore
     var docRef = await db.collection('chats').add({
-      'userId': userId,
+      'uid': uid,
       'topic': topic,
       'createdAt': now,
     });
