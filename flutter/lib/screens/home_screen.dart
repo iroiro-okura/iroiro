@@ -5,10 +5,10 @@ import 'package:iroiro/providers/chat_provider.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
-class Home extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
   final PersistentTabController controller;
 
-  const Home({super.key, required this.controller});
+  const HomeScreen({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

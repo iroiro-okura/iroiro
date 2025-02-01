@@ -4,14 +4,14 @@ import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/components/custom_button.dart';
 import 'package:iroiro/firebase/auth.dart';
 
-class Welcome extends StatefulWidget {
-  const Welcome({super.key});
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
 
   @override
-  State<Welcome> createState() => _WelcomeState();
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeState extends State<Welcome> {
+class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = false;
 
   Future<void> _handleSignIn() async {

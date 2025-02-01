@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Corggle',
           routes: {
-            '/chat': (context) => const Chat(),
-            '/account': (context) => const Account(),
+            '/chat': (context) => const ChatScreen(),
+            '/account': (context) => const AccountScreen(),
           },
           theme: ThemeData(
             fontFamily: 'Murecho',
@@ -85,7 +85,7 @@ Widget _getLandingPage() {
       } else if (snapshot.hasData) {
         return const MainPage();
       } else {
-        return const Welcome();
+        return const WelcomeScreen();
       }
     },
   );
@@ -118,7 +118,11 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _loadUserProfile();
 
-    _screens = [Home(controller: _controller), Chat(), Account()];
+    _screens = [
+      HomeScreen(controller: _controller),
+      ChatScreen(),
+      AccountScreen()
+    ];
 
     _controller.addListener(() {
       if (_controller.index == 0) {

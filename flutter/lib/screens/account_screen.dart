@@ -8,14 +8,14 @@ import 'package:iroiro/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 
-class Account extends StatefulWidget {
-  const Account({super.key});
+class AccountScreen extends StatefulWidget {
+  const AccountScreen({super.key});
 
   @override
-  State<Account> createState() => _AccountState();
+  State<AccountScreen> createState() => _AccountScreenState();
 }
 
-class _AccountState extends State<Account> {
+class _AccountScreenState extends State<AccountScreen> {
   String _username = '';
   String _gender = '';
   int _age = 0;
