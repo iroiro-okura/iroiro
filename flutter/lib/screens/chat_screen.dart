@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -52,23 +53,7 @@ class _ChatState extends State<Chat> {
     final user = Provider.of<UserProvider>(context).user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Corggle'),
-        titleTextStyle: TextStyle(
-          fontFamily: 'Alexandria',
-          fontSize: 20,
-          color: Theme.of(context).colorScheme.secondary,
-          fontWeight: FontWeight.w500,
-        ),
-        titleSpacing: 0,
-        leading: IconButton(
-          padding: const EdgeInsets.all(11),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Image.asset('assets/icon/icon_transparent.png'),
-        ),
-      ),
+      appBar: CorggleAppBar(),
       body: Column(
         children: <Widget>[
           Expanded(
@@ -134,8 +119,8 @@ class _ChatState extends State<Chat> {
                 ),
                 IconButton(
                   icon: Icon(
-                      Icons.send,
-                      color: _controller.text.isEmpty ? Colors.grey : Colors.blue,
+                    Icons.send,
+                    color: _controller.text.isEmpty ? Colors.grey : Colors.blue,
                   ),
                   onPressed: _sendMessage,
                 ),

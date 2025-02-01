@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/firebase/auth.dart';
 import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/model/user.dart';
@@ -153,21 +154,7 @@ class _AccountState extends State<Account> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Corggle'),
-        titleTextStyle: TextStyle(
-          fontFamily: 'Alexandria',
-          fontSize: 20,
-          color: Theme.of(context).colorScheme.secondary,
-          fontWeight: FontWeight.w500,
-        ),
-        titleSpacing: 0,
-        leading: IconButton(
-          padding: const EdgeInsets.all(11),
-          onPressed: null,
-          icon: Image.asset('assets/icon/icon_transparent.png'),
-        ),
-      ),
+      appBar: CorggleAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: SingleChildScrollView(
