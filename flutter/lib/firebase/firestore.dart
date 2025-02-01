@@ -115,6 +115,7 @@ class FirestoreService {
       'sender': message.sender == Sender.corggle ? 'corggle' : 'user',
       'text': message.text,
       'sentAt': message.sentAt,
+      'status': message.status.toString().split('.').last,
     });
   }
 
