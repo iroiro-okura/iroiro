@@ -5,9 +5,8 @@ class Chat {
   final String uid;
   final String topic;
   final DateTime createdAt;
-  List<Message> messages;
 
-  Chat({required this.chatId, required this.uid, required this.topic, required this.createdAt, required this.messages});
+  Chat({required this.chatId, required this.uid, required this.topic, required this.createdAt});
 
   factory Chat.fromJson(String chatId, Map<String, dynamic> chatData) {
     return Chat(
@@ -15,7 +14,6 @@ class Chat {
       uid: chatData['uid'] as String,
       topic: chatData['topic'] as String,
       createdAt: (chatData['createdAt'] as Timestamp).toDate(),
-      messages: [],
     );
   }
 }

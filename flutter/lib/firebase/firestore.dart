@@ -80,7 +80,7 @@ class FirestoreService {
     }
   }
 
-  static Future<void> createChat(String uid, String topic, String initialMessage) async {
+  static Future<Chat> createChat(String uid, String topic, String initialMessage) async {
     logger.i('Creating chat for user $uid with topic $topic');
 
     DateTime now = DateTime.now();
@@ -101,6 +101,12 @@ class FirestoreService {
 
     // Use the sendMessage function to save the initial message
     await sendMessage(docRef.id, message);
+
+    Chat? chat = await getChat(docRef.id);
+    if (chat == null) {
+      throw Exception('Chat not found');
+    }
+    return chat;
   }
 
   static Future<void> sendMessage(String chatId, Message message) async {
@@ -118,8 +124,6 @@ class FirestoreService {
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>;
         var chat = Chat.fromJson(chatId, data);
-        var messages = await getMessages(chatId);
-        chat.messages = messages ?? [];
         return chat;
       } else {
         logger.w('Chat $chatId does not exist');
