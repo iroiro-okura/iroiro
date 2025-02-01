@@ -12,7 +12,7 @@ class Chat {
   factory Chat.fromJson(String chatId, Map<String, dynamic> chatData) {
     return Chat(
       chatId: chatId,
-      uid: chatData['userId'] as String,
+      uid: chatData['uid'] as String,
       topic: chatData['topic'] as String,
       createdAt: (chatData['createdAt'] as Timestamp).toDate(),
       messages: [],
