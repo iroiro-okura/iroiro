@@ -45,6 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     targetChat =
         await FirestoreService.createChat(uid, chatArgument, initialMessage);
+    if (targetChat == null) return;
 
     // Remove this from here
     await Future.delayed(const Duration(seconds: 2));
@@ -120,26 +121,55 @@ class _ChatScreenState extends State<ChatScreen> {
         isReplyAllowed: false,
       ),
     );
+    setState(() {
+      _lastMessage = null;
+    });
+    // Remove this
+    await Future.delayed(const Duration(seconds: 1));
+    FirestoreService.sendMessage(
+      targetChat!.chatId,
+      Message(
+        sender: Sender.corggle,
+        text: "this is demo response from Corggle",
+        status: Status.sent,
+        sentAt: DateTime.now(),
+        isReplyAllowed: true,
+        answerOptions: ["Option 1", "Option 2", "Option 3"],
+      ),
+    );
   }
 
-  Widget _buildAvatar(String name, bool isUser) {
-    return isUser
-        ? ClipOval(
-            child: SvgPicture.string(
-              RandomAvatarString(name),
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
-          )
-        : ClipOval(
-            child: Image.asset(
-              'assets/images/cogimi.png',
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
-          );
+  Widget _buildAvatar(String name, bool isUser, String? status) {
+    if (isUser) {
+      return ClipOval(
+        child: SvgPicture.string(
+          RandomAvatarString(name),
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      if (status == "inProgress") {
+        return ClipRRect(
+          child: Image.asset(
+            'assets/images/cogimi_thinking.png',
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+          ),
+        );
+      } else {
+        return ClipRRect(
+          child: Image.asset(
+            'assets/images/cogimi.png',
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -162,8 +192,15 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
 
                 final messages = snapshot.data!.docs;
-                _lastMessage = Message.fromJson(
-                    messages.last.data() as Map<String, dynamic>);
+                final lastMessageData =
+                    messages.last.data() as Map<String, dynamic>;
+                final lastMessage = Message.fromJson(lastMessageData);
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _lastMessage = lastMessage;
+                  });
+                });
 
                 return ListView.builder(
                   itemCount: messages.length,
@@ -171,19 +208,22 @@ class _ChatScreenState extends State<ChatScreen> {
                     final message = messages[index];
                     final data = message.data() as Map<String, dynamic>;
                     final isUser = data['sender'] == 'user';
+                    final status = data['status'];
 
                     return Align(
                         alignment: isUser
                             ? Alignment.centerRight
                             : Alignment.centerLeft,
                         child: ListTile(
-                          leading: isUser ? null : _buildAvatar(name, false),
-                          trailing: isUser ? _buildAvatar(name, true) : null,
+                          leading:
+                              isUser ? null : _buildAvatar(name, false, status),
+                          trailing:
+                              isUser ? _buildAvatar(name, true, null) : null,
                           title: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color:
-                                  isUser ? Colors.blue[100] : Colors.grey[300],
+                                  isUser ? Colors.brown[100] : Colors.grey[300],
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: data["status"] == "inProgress"
@@ -209,6 +249,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   onPressed: () {
                     _sendMessageFromOption(option);
                   },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
                   child: Text(option),
                 );
               }).toList(),
@@ -219,7 +264,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
-                    enabled: _lastMessage?.isReplyAllowed ?? false,
+                    enabled: _lastMessage?.isReplyAllowed,
                     controller: _controller,
                     decoration: const InputDecoration(
                       hintText: 'メッセージを入力',

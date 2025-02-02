@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iroiro/firebase/firestore.dart';
 
 class Chat {
   final String chatId;
@@ -41,15 +42,21 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> data) {
+    logger.d('Message.fromJson: $data');
     return Message(
       sender: data['sender'] == 'corggle' ? Sender.corggle : Sender.user,
       text: data['text'] as String,
       status: Status.values
           .firstWhere((e) => e.toString() == 'Status.${data['status']}'),
       sentAt: (data['sentAt'] as Timestamp).toDate(),
-      isReplyAllowed: data['isReplyAllowed'] as bool? ?? false,
+      isReplyAllowed: data['isReplyAllowed'] as bool,
       answerOptions: List<String>.from(data['answerOptions'] as List? ?? []),
     );
+  }
+
+  @override
+  String toString() {
+    return 'Message{sender: $sender, text: $text, sentAt: $sentAt, status: $status, isReplyAllowed: $isReplyAllowed, answerOptions: $answerOptions}';
   }
 }
 

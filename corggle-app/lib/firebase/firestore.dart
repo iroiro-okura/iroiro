@@ -118,6 +118,8 @@ class FirestoreService {
       'text': message.text,
       'sentAt': message.sentAt,
       'status': message.status.toString().split('.').last,
+      'isReplyAllowed': message.isReplyAllowed,
+      'answerOptions': message.answerOptions,
     });
   }
 
