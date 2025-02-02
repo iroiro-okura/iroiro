@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iroiro/components/animation_dot.dart';
 import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/model/chat.dart';
@@ -23,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late String chatArgument;
   Chat? targetChat;
   Stream<QuerySnapshot>? _chatsStream;
+  Message? _lastMessage;
 
   @override
   void initState() {
@@ -44,6 +46,29 @@ class _ChatScreenState extends State<ChatScreen> {
     targetChat =
         await FirestoreService.createChat(uid, chatArgument, initialMessage);
 
+    // Remove this from here
+    await Future.delayed(const Duration(seconds: 2));
+    FirestoreService.sendMessage(
+      targetChat!.chatId,
+      Message(
+        sender: Sender.corggle,
+        text: "お相手の性別は？",
+        status: Status.sent,
+        sentAt: DateTime.now(),
+        isReplyAllowed: true,
+        answerOptions: ["男性", "女性", "その他"],
+      ),
+    );
+    _lastMessage = Message(
+      sender: Sender.corggle,
+      text: "お相手の性別は？",
+      status: Status.sent,
+      sentAt: DateTime.now(),
+      isReplyAllowed: true,
+      answerOptions: ["男性", "女性", "その他"],
+    );
+    // to here
+
     if (targetChat != null) {
       setState(() {
         _chatsStream = FirebaseFirestore.instance
@@ -61,11 +86,11 @@ class _ChatScreenState extends State<ChatScreen> {
       FirestoreService.sendMessage(
         targetChat!.chatId,
         Message(
-          sender: Sender.user,
-          text: _controller.text,
-          status: Status.sent,
-          sentAt: DateTime.now(),
-        ),
+            sender: Sender.user,
+            text: _controller.text,
+            status: Status.sent,
+            sentAt: DateTime.now(),
+            isReplyAllowed: false),
       );
       // Remove this
       await Future.delayed(const Duration(seconds: 1));
@@ -74,12 +99,27 @@ class _ChatScreenState extends State<ChatScreen> {
         Message(
           sender: Sender.corggle,
           text: "this is demo response from Corggle",
-          status: Status.inProgress,
+          status: Status.sent,
           sentAt: DateTime.now(),
+          isReplyAllowed: true,
+          answerOptions: ["Option 1", "Option 2", "Option 3"],
         ),
       );
       _controller.clear();
     }
+  }
+
+  void _sendMessageFromOption(String option) async {
+    FirestoreService.sendMessage(
+      targetChat!.chatId,
+      Message(
+        sender: Sender.user,
+        text: option,
+        status: Status.sent,
+        sentAt: DateTime.now(),
+        isReplyAllowed: false,
+      ),
+    );
   }
 
   Widget _buildAvatar(String name, bool isUser) {
@@ -122,6 +162,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
 
                 final messages = snapshot.data!.docs;
+                _lastMessage = Message.fromJson(
+                    messages.last.data() as Map<String, dynamic>);
+
                 return ListView.builder(
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
@@ -130,39 +173,53 @@ class _ChatScreenState extends State<ChatScreen> {
                     final isUser = data['sender'] == 'user';
 
                     return Align(
-                      alignment:
-                          isUser ? Alignment.centerRight : Alignment.centerLeft,
-                      child: ListTile(
-                        leading: isUser ? null : _buildAvatar(name, false),
-                        trailing: isUser ? _buildAvatar(name, true) : null,
-                        title: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: isUser ? Colors.blue[100] : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(10),
+                        alignment: isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: ListTile(
+                          leading: isUser ? null : _buildAvatar(name, false),
+                          trailing: isUser ? _buildAvatar(name, true) : null,
+                          title: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color:
+                                  isUser ? Colors.blue[100] : Colors.grey[300],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: data["status"] == "inProgress"
+                                ? const AnimatedDots()
+                                : data["status"] == "sent"
+                                    ? Text(data['text'])
+                                    : Text(
+                                        "エラーが発生しました",
+                                        style:
+                                            const TextStyle(color: Colors.red),
+                                      ),
                           ),
-                          child: data["status"] == "inProgress"
-                              ? const AnimatedDots()
-                              : data["status"] == "sent"
-                                  ? Text(data['text'])
-                                  : Text(
-                                      "エラーが発生しました",
-                                      style: const TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    )
-                    );
+                        ));
                   },
                 );
               },
             ),
           ),
+          if (_lastMessage != null && _lastMessage!.answerOptions != null)
+            Column(
+              children: _lastMessage!.answerOptions!.map((option) {
+                return ElevatedButton(
+                  onPressed: () {
+                    _sendMessageFromOption(option);
+                  },
+                  child: Text(option),
+                );
+              }).toList(),
+            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: <Widget>[
                 Expanded(
                   child: TextField(
+                    enabled: _lastMessage?.isReplyAllowed ?? false,
                     controller: _controller,
                     decoration: const InputDecoration(
                       hintText: 'メッセージを入力',
@@ -178,43 +235,6 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// 入力中アニメーション（ドットが増える）
-class AnimatedDots extends StatefulWidget {
-  const AnimatedDots({super.key});
-
-  @override
-  _AnimatedDotsState createState() => _AnimatedDotsState();
-}
-
-class _AnimatedDotsState extends State<AnimatedDots> {
-  int _dotCount = 1;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      setState(() {
-        _dotCount = (_dotCount % 3) + 1; // 1 → 2 → 3 → 1
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      '.' * _dotCount,
-      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
 }

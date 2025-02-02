@@ -80,7 +80,8 @@ class FirestoreService {
     }
   }
 
-  static Future<Chat> createChat(String uid, String topic, String initialMessage) async {
+  static Future<Chat> createChat(
+      String uid, String topic, String initialMessage) async {
     logger.i('Creating chat for user $uid with topic $topic');
 
     DateTime now = DateTime.now();
@@ -97,6 +98,7 @@ class FirestoreService {
       text: initialMessage,
       status: Status.sent,
       sentAt: now,
+      isReplyAllowed: false,
     );
 
     // Use the sendMessage function to save the initial message
@@ -121,7 +123,11 @@ class FirestoreService {
 
   static Future<Chat?> getChat(String chatId) async {
     logger.i('Getting chat $chatId');
-    return await db.collection('chats').doc(chatId).get().then((snapshot) async {
+    return await db
+        .collection('chats')
+        .doc(chatId)
+        .get()
+        .then((snapshot) async {
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>;
         var chat = Chat.fromJson(chatId, data);
@@ -135,7 +141,8 @@ class FirestoreService {
 
   static Future<List<Message>?> getMessages(String chatId) async {
     logger.i('Getting messages for chat $chatId');
-    var querySnapshot = await db.collection('chats').doc(chatId).collection('messages').get();
+    var querySnapshot =
+        await db.collection('chats').doc(chatId).collection('messages').get();
     return querySnapshot.docs.map((doc) {
       return Message.fromJson(doc.data());
     }).toList();
@@ -143,10 +150,13 @@ class FirestoreService {
 
   static Stream<List<Message>> messageStream(String chatId) {
     logger.i('Listening to messages for chat $chatId');
-    return db.collection('chats').doc(chatId).collection('messages')
-    .orderBy('sentAt', descending: false)
-    .snapshots()
-    .map((snapshot) {
+    return db
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .orderBy('sentAt', descending: false)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) => Message.fromJson(doc.data())).toList();
     });
   }

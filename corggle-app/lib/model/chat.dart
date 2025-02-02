@@ -6,7 +6,12 @@ class Chat {
   final String topic;
   final DateTime createdAt;
 
-  Chat({required this.chatId, required this.uid, required this.topic, required this.createdAt});
+  Chat({
+    required this.chatId,
+    required this.uid,
+    required this.topic,
+    required this.createdAt,
+  });
 
   factory Chat.fromJson(String chatId, Map<String, dynamic> chatData) {
     return Chat(
@@ -23,15 +28,27 @@ class Message {
   final String text;
   final Status status;
   final DateTime sentAt;
+  final bool isReplyAllowed;
+  final List<String>? answerOptions;
 
-  Message({required this.sender, required this.text, required this.status, required this.sentAt});
+  Message({
+    required this.sender,
+    required this.text,
+    required this.status,
+    required this.sentAt,
+    required this.isReplyAllowed,
+    this.answerOptions,
+  });
 
   factory Message.fromJson(Map<String, dynamic> data) {
     return Message(
       sender: data['sender'] == 'corggle' ? Sender.corggle : Sender.user,
       text: data['text'] as String,
-      status: Status.values.firstWhere((e) => e.toString() == 'Status.${data['status']}'),
+      status: Status.values
+          .firstWhere((e) => e.toString() == 'Status.${data['status']}'),
       sentAt: (data['sentAt'] as Timestamp).toDate(),
+      isReplyAllowed: data['isReplyAllowed'] as bool? ?? false,
+      answerOptions: List<String>.from(data['answerOptions'] as List? ?? []),
     );
   }
 }
