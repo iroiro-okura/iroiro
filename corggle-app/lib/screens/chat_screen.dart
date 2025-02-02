@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
 import 'package:iroiro/components/animation_dot.dart';
 import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/firebase/firestore.dart';
@@ -172,14 +173,43 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void _startNewChat() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final uid = userProvider.user!.uid;
+
+    const initialMessage =
+        'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は話題を探しているんだね。\n最適な話題を見つけるためにも、シチュエーションとお相手について教えてほしいな！';
+
+    final newChat = await FirestoreService.createChat(uid, '', initialMessage);
+
+    setState(() {
+      targetChat = newChat;
+      _chatsStream = FirebaseFirestore.instance
+          .collection('chats')
+          .doc(targetChat!.chatId)
+          .collection('messages')
+          .orderBy('sentAt', descending: false)
+          .snapshots();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final name = Provider.of<UserProvider>(context, listen: false).user!.name;
 
     return Scaffold(
       appBar: CorggleAppBar(),
+      floatingActionButton: SizedBox(
+          width: 30,
+          height: 30,
+          child: FloatingActionButton(
+            onPressed: _startNewChat,
+            child: const Icon(Icons.add),
+          )),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: Column(
         children: <Widget>[
+          Gap(20),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _chatsStream,
