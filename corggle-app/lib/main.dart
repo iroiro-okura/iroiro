@@ -7,6 +7,7 @@ import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
 import 'package:iroiro/screens/account_screen.dart';
 import 'package:iroiro/screens/chat_screen.dart';
+import 'package:iroiro/screens/history_screen.dart';
 import 'package:iroiro/screens/home_screen.dart';
 import 'package:iroiro/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
           title: 'Corggle',
           routes: {
             '/chat': (context) => const ChatScreen(),
+            '/history': (context) => const HistoryScreen(),
             '/account': (context) => const AccountScreen(),
           },
           theme: ThemeData(
@@ -121,6 +123,7 @@ class _MainPageState extends State<MainPage> {
     _screens = [
       HomeScreen(controller: _controller),
       ChatScreen(),
+      HistoryScreen(),
       AccountScreen()
     ];
 
@@ -165,6 +168,11 @@ class _MainPageState extends State<MainPage> {
               activeColorPrimary: Theme.of(context).colorScheme.primary,
               inactiveColorPrimary: Theme.of(context).colorScheme.secondary,
               title: 'チャット'),
+          PersistentBottomNavBarItem(
+              icon: Icon(Icons.history),
+              activeColorPrimary: Theme.of(context).colorScheme.primary,
+              inactiveColorPrimary: Theme.of(context).colorScheme.secondary,
+              title: ' 履歴'),
           PersistentBottomNavBarItem(
               icon: Icon(Icons.person),
               activeColorPrimary: Theme.of(context).colorScheme.primary,

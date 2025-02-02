@@ -22,6 +22,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   late String chatArgument;
   Chat? targetChat;
   Stream<QuerySnapshot>? _chatsStream;
@@ -94,6 +96,7 @@ class _ChatScreenState extends State<ChatScreen> {
             sentAt: DateTime.now(),
             isReplyAllowed: false),
       );
+
       // Remove this
       await Future.delayed(const Duration(seconds: 1));
       FirestoreService.sendMessage(
@@ -125,6 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _lastMessage = null;
     });
+
     // Remove this
     await Future.delayed(const Duration(seconds: 1));
     FirestoreService.sendMessage(
@@ -151,25 +155,28 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
     } else {
-      if (status == "inProgress") {
-        return ClipRRect(
-          child: Image.asset(
-            'assets/images/cogimi_thinking.png',
-            width: 40,
-            height: 40,
-            fit: BoxFit.cover,
-          ),
+      return ClipRRect(
+        child: Image.asset(
+          status == "inProgress"
+              ? 'assets/images/cogimi_thinking.png'
+              : 'assets/images/cogimi.png',
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
         );
-      } else {
-        return ClipRRect(
-          child: Image.asset(
-            'assets/images/cogimi.png',
-            width: 40,
-            height: 40,
-            fit: BoxFit.cover,
-          ),
-        );
-      }
+      });
     }
   }
 
@@ -209,7 +216,7 @@ class _ChatScreenState extends State<ChatScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: Column(
         children: <Widget>[
-          Gap(20),
+          const Gap(20),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _chatsStream,
@@ -226,14 +233,23 @@ class _ChatScreenState extends State<ChatScreen> {
                     messages.last.data() as Map<String, dynamic>;
                 final lastMessage = Message.fromJson(lastMessageData);
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    _lastMessage = lastMessage;
+                if (_lastMessage == null ||
+                    _lastMessage!.text != lastMessage.text) {
+                  Future.microtask(() {
+                    if (mounted) {
+                      setState(() {
+                        _lastMessage = lastMessage;
+                      });
+                      _scrollToBottom();
+                    }
                   });
-                });
+                }
 
                 return ListView.builder(
                   itemCount: messages.length,
+                  cacheExtent: 1000,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
                   itemBuilder: (context, index) {
                     final message = messages[index];
                     final data = message.data() as Map<String, dynamic>;
@@ -241,32 +257,31 @@ class _ChatScreenState extends State<ChatScreen> {
                     final status = data['status'];
 
                     return Align(
-                        alignment: isUser
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: ListTile(
-                          leading:
-                              isUser ? null : _buildAvatar(name, false, status),
-                          trailing:
-                              isUser ? _buildAvatar(name, true, null) : null,
-                          title: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color:
-                                  isUser ? Colors.brown[100] : Colors.grey[300],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: data["status"] == "inProgress"
-                                ? const AnimatedDots()
-                                : data["status"] == "sent"
-                                    ? Text(data['text'])
-                                    : Text(
-                                        "エラーが発生しました",
-                                        style:
-                                            const TextStyle(color: Colors.red),
-                                      ),
+                      alignment:
+                          isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      child: ListTile(
+                        leading:
+                            isUser ? null : _buildAvatar(name, false, status),
+                        trailing:
+                            isUser ? _buildAvatar(name, true, null) : null,
+                        title: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color:
+                                isUser ? Colors.brown[100] : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                        ));
+                          child: data["status"] == "inProgress"
+                              ? const AnimatedDots()
+                              : data["status"] == "sent"
+                                  ? Text(data['text'])
+                                  : const Text(
+                                      "エラーが発生しました",
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                        ),
+                      ),
+                    );
                   },
                 );
               },

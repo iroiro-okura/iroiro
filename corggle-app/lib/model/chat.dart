@@ -22,6 +22,16 @@ class Chat {
       createdAt: (chatData['createdAt'] as Timestamp).toDate(),
     );
   }
+
+  factory Chat.fromDocument(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Chat(
+      chatId: doc.id,
+      uid: data['uid'] as String,
+      topic: data['chatArgument'] as String? ?? 'No topic',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+    );
+  }
 }
 
 class Message {
