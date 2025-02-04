@@ -94,7 +94,7 @@ class FirestoreService {
 
     // Create a Message object
     Message message = Message(
-      sender: Sender.corggle,
+      sender: Sender.model,
       text: initialMessage,
       status: Status.sent,
       sentAt: now,
@@ -114,7 +114,7 @@ class FirestoreService {
   static Future<void> sendMessage(String chatId, Message message) async {
     logger.i('Sending message $message to chat $chatId');
     await db.collection('chats').doc(chatId).collection('messages').add({
-      'sender': message.sender == Sender.corggle ? 'corggle' : 'user',
+      'sender': message.sender == Sender.model ? 'model' : 'user',
       'text': message.text,
       'sentAt': message.sentAt,
       'status': message.status.toString().split('.').last,

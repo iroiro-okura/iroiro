@@ -55,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
     FirestoreService.sendMessage(
       targetChat!.chatId,
       Message(
-        sender: Sender.corggle,
+        sender: Sender.model,
         text: "お相手の性別は？",
         status: Status.sent,
         sentAt: DateTime.now(),
@@ -64,7 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
     _lastMessage = Message(
-      sender: Sender.corggle,
+      sender: Sender.model,
       text: "お相手の性別は？",
       status: Status.sent,
       sentAt: DateTime.now(),
@@ -102,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
       FirestoreService.sendMessage(
         targetChat!.chatId,
         Message(
-          sender: Sender.corggle,
+          sender: Sender.model,
           text: "this is demo response from Corggle",
           status: Status.sent,
           sentAt: DateTime.now(),
@@ -134,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
     FirestoreService.sendMessage(
       targetChat!.chatId,
       Message(
-        sender: Sender.corggle,
+        sender: Sender.model,
         text: "this is demo response from Corggle",
         status: Status.sent,
         sentAt: DateTime.now(),

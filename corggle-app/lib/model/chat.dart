@@ -54,7 +54,7 @@ class Message {
   factory Message.fromJson(Map<String, dynamic> data) {
     logger.d('Message.fromJson: $data');
     return Message(
-      sender: data['sender'] == 'corggle' ? Sender.corggle : Sender.user,
+      sender: data['sender'] == 'model' ? Sender.model : Sender.user,
       text: data['text'] as String,
       status: Status.values
           .firstWhere((e) => e.toString() == 'Status.${data['status']}'),
@@ -77,6 +77,6 @@ enum Status {
 }
 
 enum Sender {
-  corggle,
+  model,
   user,
 }
