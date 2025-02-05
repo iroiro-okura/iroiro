@@ -273,7 +273,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           child: data["status"] == "inProgress"
                               ? const AnimatedDots()
-                              : data["status"] == "sent"
+                              : data["status"] == "completed"
                                   ? Text(data['text'])
                                   : const Text(
                                       "エラーが発生しました",
