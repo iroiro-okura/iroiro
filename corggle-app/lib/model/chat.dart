@@ -80,3 +80,5 @@ enum Sender {
   model,
   user,
 }
+
+enum Topic { dating, reunion, companyGathering }
