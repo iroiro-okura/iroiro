@@ -57,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
       Message(
         sender: Sender.model,
         text: "お相手の性別は？",
-        status: Status.sent,
+        status: Status.completed,
         sentAt: DateTime.now(),
         isReplyAllowed: true,
         answerOptions: ["男性", "女性", "その他"],
@@ -66,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _lastMessage = Message(
       sender: Sender.model,
       text: "お相手の性別は？",
-      status: Status.sent,
+      status: Status.completed,
       sentAt: DateTime.now(),
       isReplyAllowed: true,
       answerOptions: ["男性", "女性", "その他"],
@@ -92,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
         Message(
             sender: Sender.user,
             text: _controller.text,
-            status: Status.sent,
+            status: Status.completed,
             sentAt: DateTime.now(),
             isReplyAllowed: false),
       );
@@ -104,7 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
         Message(
           sender: Sender.model,
           text: "this is demo response from Corggle",
-          status: Status.sent,
+          status: Status.completed,
           sentAt: DateTime.now(),
           isReplyAllowed: true,
           answerOptions: ["Option 1", "Option 2", "Option 3"],
@@ -120,7 +120,7 @@ class _ChatScreenState extends State<ChatScreen> {
       Message(
         sender: Sender.user,
         text: option,
-        status: Status.sent,
+        status: Status.completed,
         sentAt: DateTime.now(),
         isReplyAllowed: false,
       ),
@@ -136,7 +136,7 @@ class _ChatScreenState extends State<ChatScreen> {
       Message(
         sender: Sender.model,
         text: "this is demo response from Corggle",
-        status: Status.sent,
+        status: Status.completed,
         sentAt: DateTime.now(),
         isReplyAllowed: true,
         answerOptions: ["Option 1", "Option 2", "Option 3"],

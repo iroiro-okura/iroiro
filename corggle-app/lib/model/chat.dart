@@ -73,7 +73,7 @@ class Message {
 enum Status {
   inProgress,
   failed,
-  sent,
+  completed,
 }
 
 enum Sender {
