@@ -81,14 +81,14 @@ class FirestoreService {
   }
 
   static Future<Chat> createChat(
-      String uid, String topic, String initialMessage) async {
-    logger.i('Creating chat for user $uid with topic $topic');
+      String uid, String scene, String initialMessage) async {
+    logger.i('Creating chat for user $uid with scene $scene');
 
     DateTime now = DateTime.now();
     // Save the chat to Firestore
     var docRef = await db.collection('chats').add({
       'uid': uid,
-      'topic': topic,
+      'scene': scene,
       'createdAt': now,
     });
 
@@ -96,7 +96,7 @@ class FirestoreService {
     Message message = Message(
       sender: Sender.model,
       text: initialMessage,
-      status: Status.sent,
+      status: Status.completed,
       sentAt: now,
       isReplyAllowed: false,
     );

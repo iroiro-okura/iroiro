@@ -57,7 +57,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               final chat = chats[index];
               return ListTile(
                 title: Text(chat.createdAt.toString()),
-                subtitle: Text(chat.topic),
+                subtitle: Text(chat.scene),
                 // onTap: () {
                 //   Navigator.push(
                 //     context,

@@ -4,13 +4,13 @@ import 'package:iroiro/firebase/firestore.dart';
 class Chat {
   final String chatId;
   final String uid;
-  final String topic;
+  final String scene;
   final DateTime createdAt;
 
   Chat({
     required this.chatId,
     required this.uid,
-    required this.topic,
+    required this.scene,
     required this.createdAt,
   });
 
@@ -18,7 +18,7 @@ class Chat {
     return Chat(
       chatId: chatId,
       uid: chatData['uid'] as String,
-      topic: chatData['topic'] as String,
+      scene: chatData['scene'] as String,
       createdAt: (chatData['createdAt'] as Timestamp).toDate(),
     );
   }
@@ -28,7 +28,7 @@ class Chat {
     return Chat(
       chatId: doc.id,
       uid: data['uid'] as String,
-      topic: data['chatArgument'] as String? ?? 'No topic',
+      scene: data['chatArgument'] as String? ?? 'No scene',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
