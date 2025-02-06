@@ -55,7 +55,7 @@ class FirestoreService {
       updatedFields['age'] = user.age;
     }
     if (user.gender != existingUser.gender) {
-      updatedFields['gender'] = user.gender?.index;
+      updatedFields['gender'] = user.gender?.name;
     }
     if (user.occupation != existingUser.occupation) {
       updatedFields['occupation'] = user.occupation;
