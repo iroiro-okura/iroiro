@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
             colorScheme: const ColorScheme(
               brightness: Brightness.dark,
               primary: Color.fromRGBO(234, 141, 80, 1.0),
-              onPrimary: Color.fromRGBO(255, 255, 255, 1.0),
+              onPrimary: Color.fromRGBO(77, 20, 20, 1.0),
               secondary: Color.fromRGBO(229, 229, 183, 1.0),
               onSecondary: Color.fromRGBO(51, 6, 5, 1.0),
               tertiary: Color.fromRGBO(71, 71, 71, 1.0),
@@ -129,7 +129,7 @@ class _MainPageState extends State<MainPage> {
 
     _controller.addListener(() {
       if (_controller.index == 0) {
-        Provider.of<ChatProvider>(context, listen: false).resetArgument();
+        Provider.of<ChatProvider>(context, listen: false).resetTopic();
       }
     });
   }
@@ -137,7 +137,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _loadUserProfile() async {
     final user = AuthService.auth.currentUser;
     if (user != null) {
-      final userProfile = await FirestoreService.getUser();
+      final userProfile =await FirestoreService.getUser();
       if (!mounted) return;
       if (userProfile != null) {
         Provider.of<UserProvider>(context, listen: false).setUser(userProfile);

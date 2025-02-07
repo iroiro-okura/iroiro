@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class User {
   User({
     required this.uid,
@@ -23,7 +21,10 @@ class User {
       email: data['email'] as String,
       name: data['name'] as String,
       age: data['age'] as int?,
-      gender: data['gender'] != null ? Gender.values[data['gender'] as int] : null,
+      gender: data['gender'] != null
+          ? Gender.values
+              .firstWhere((e) => e.toString() == 'Gender.${data['gender']}')
+          : null,
       occupation: data['occupation'] as String?,
     );
   }

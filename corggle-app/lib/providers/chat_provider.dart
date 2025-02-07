@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:iroiro/firebase/firestore.dart';
+import 'package:iroiro/model/chat.dart';
 
 class ChatProvider with ChangeNotifier {
-  String _argument = '';
+  String _topic = '';
+  late Chat _chat;
 
-  String get argument => _argument;
+  String get argument => _topic;
+  Chat get chat => _chat;
 
-  void setArgument(String argument) {
-    _argument = argument;
+  void setTopic(String topic) {
+    _topic = topic;
     notifyListeners();
   }
 
-  void resetArgument() {
-    _argument = '';
+  void resetTopic() {
+    _topic = '';
     notifyListeners();
+  }
+
+  Future<void> createNewChat(String uid, String topic) async {
+    _chat = await FirestoreService.createChat(uid, topic, "");
   }
 }

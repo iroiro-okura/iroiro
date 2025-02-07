@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
@@ -24,65 +23,25 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  late String chatArgument;
   Chat? targetChat;
-  Stream<QuerySnapshot>? _chatsStream;
   Message? _lastMessage;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    targetChat = chatProvider.chat;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    _initializeChat();
-  }
-
-  Future<void> _initializeChat() async {
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    chatArgument = chatProvider.argument;
-    final uid = userProvider.user!.uid;
-
-    final initialMessage = chatArgument.isEmpty
-        ? 'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は話題を探しているんだね。\n最適な話題を見つけるためにも、シチュエーションとお相手について教えてほしいな！'
-        : 'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は『$chatArgument』で話題を探しているんだね。\n最適な話題を見つけるためにも、お相手のことをもう少し教えてほしいな！';
-
-    targetChat =
-        await FirestoreService.createChat(uid, chatArgument, initialMessage);
-    if (targetChat == null) return;
-
-    // Remove this from here
-    await Future.delayed(const Duration(seconds: 2));
-    FirestoreService.sendMessage(
-      targetChat!.chatId,
-      Message(
-        sender: Sender.model,
-        text: "お相手の性別は？",
-        status: Status.completed,
-        sentAt: DateTime.now(),
-        isReplyAllowed: true,
-        answerOptions: ["男性", "女性", "その他"],
-      ),
-    );
-    _lastMessage = Message(
-      sender: Sender.model,
-      text: "お相手の性別は？",
-      status: Status.completed,
-      sentAt: DateTime.now(),
-      isReplyAllowed: true,
-      answerOptions: ["男性", "女性", "その他"],
-    );
-    // to here
-
-    if (targetChat != null) {
-      setState(() {
-        _chatsStream = FirebaseFirestore.instance
-            .collection('chats')
-            .doc(targetChat!.chatId)
-            .collection('messages')
-            .orderBy('sentAt', descending: false)
-            .snapshots();
-      });
-    }
   }
 
   void _sendMessage() async {
@@ -97,19 +56,6 @@ class _ChatScreenState extends State<ChatScreen> {
             isReplyAllowed: false),
       );
 
-      // Remove this
-      await Future.delayed(const Duration(seconds: 1));
-      FirestoreService.sendMessage(
-        targetChat!.chatId,
-        Message(
-          sender: Sender.model,
-          text: "this is demo response from Corggle",
-          status: Status.completed,
-          sentAt: DateTime.now(),
-          isReplyAllowed: true,
-          answerOptions: ["Option 1", "Option 2", "Option 3"],
-        ),
-      );
       _controller.clear();
     }
   }
@@ -128,23 +74,9 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _lastMessage = null;
     });
-
-    // Remove this
-    await Future.delayed(const Duration(seconds: 1));
-    FirestoreService.sendMessage(
-      targetChat!.chatId,
-      Message(
-        sender: Sender.model,
-        text: "this is demo response from Corggle",
-        status: Status.completed,
-        sentAt: DateTime.now(),
-        isReplyAllowed: true,
-        answerOptions: ["Option 1", "Option 2", "Option 3"],
-      ),
-    );
   }
 
-  Widget _buildAvatar(String name, bool isUser, String? status) {
+  Widget _buildAvatar(String name, bool isUser, Status? status) {
     if (isUser) {
       return ClipOval(
         child: SvgPicture.string(
@@ -169,40 +101,31 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
-      });
-    }
+      }
+    });
   }
 
   void _startNewChat() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     final uid = userProvider.user!.uid;
 
-    const initialMessage =
-        'Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n今回は話題を探しているんだね。\n最適な話題を見つけるためにも、シチュエーションとお相手について教えてほしいな！';
-
-    final newChat = await FirestoreService.createChat(uid, '', initialMessage);
-
-    setState(() {
-      targetChat = newChat;
-      _chatsStream = FirebaseFirestore.instance
-          .collection('chats')
-          .doc(targetChat!.chatId)
-          .collection('messages')
-          .orderBy('sentAt', descending: false)
-          .snapshots();
-    });
+    chatProvider.createNewChat(uid, "");
+    chatProvider.setTopic("");
   }
 
   @override
   Widget build(BuildContext context) {
     final name = Provider.of<UserProvider>(context, listen: false).user!.name;
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: CorggleAppBar(),
@@ -218,20 +141,19 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           const Gap(20),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _chatsStream,
+            child: StreamBuilder<List<Message>>(
+              stream: FirestoreService.messageStream(chatProvider.chat.chatId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: AnimatedDots());
                 }
 
-                final messages = snapshot.data!.docs;
-                final lastMessageData =
-                    messages.last.data() as Map<String, dynamic>;
-                final lastMessage = Message.fromJson(lastMessageData);
+                final messages = snapshot.data;
+                final lastMessage = messages!.last;
+                logger.i('Last message: $lastMessage');
 
                 if (_lastMessage == null ||
                     _lastMessage!.text != lastMessage.text) {
@@ -252,9 +174,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   controller: _scrollController,
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    final data = message.data() as Map<String, dynamic>;
-                    final isUser = data['sender'] == 'user';
-                    final status = data['status'];
+                    final isUser = message.sender == Sender.user;
+                    final status = message.status;
 
                     return Align(
                       alignment:
@@ -267,17 +188,19 @@ class _ChatScreenState extends State<ChatScreen> {
                         title: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color:
-                                isUser ? Colors.brown[100] : Colors.grey[300],
+                            color: isUser
+                                ? theme.colorScheme.primary.withAlpha(50)
+                                : theme.colorScheme.tertiary,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: data["status"] == "inProgress"
+                          child: message.status == Status.inProgress
                               ? const AnimatedDots()
-                              : data["status"] == "completed"
-                                  ? Text(data['text'])
-                                  : const Text(
+                              : message.status == Status.sent
+                                  ? Text(message.text)
+                                  : Text(
                                       "エラーが発生しました",
-                                      style: TextStyle(color: Colors.red),
+                                      style: TextStyle(
+                                          color: theme.colorScheme.error),
                                     ),
                         ),
                       ),
@@ -288,18 +211,21 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           if (_lastMessage != null && _lastMessage!.answerOptions != null)
-            Column(
+            Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: _lastMessage!.answerOptions!.map((option) {
                 return ElevatedButton(
                   onPressed: () {
                     _sendMessageFromOption(option);
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.secondary,
+                      foregroundColor: theme.colorScheme.onSecondary,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30))),
-                  child: Text(option),
+                          borderRadius: BorderRadius.circular(20))),
+                  child: Text(option,
+                      style: TextStyle(color: theme.colorScheme.onSecondary)),
                 );
               }).toList(),
             ),
@@ -311,8 +237,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: TextField(
                     enabled: _lastMessage?.isReplyAllowed,
                     controller: _controller,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'メッセージを入力',
+                      hintStyle: TextStyle(color: theme.hintColor),
                     ),
                   ),
                 ),
