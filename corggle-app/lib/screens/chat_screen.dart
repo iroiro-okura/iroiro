@@ -213,23 +213,33 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           if (_lastMessage != null && _lastMessage!.answerOptions != null)
-            Flex(
-              direction: Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: _lastMessage!.answerOptions!.map((option) {
-                return ElevatedButton(
-                  onPressed: () {
-                    _sendMessageFromOption(option);
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.secondary,
-                      foregroundColor: theme.colorScheme.onSecondary,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20))),
-                  child: Text(option,
-                      style: TextStyle(color: theme.colorScheme.onSecondary)),
-                );
-              }).toList(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.center,
+                children: _lastMessage!.answerOptions!.map((option) {
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: ElevatedButton(
+                      onPressed: () => _sendMessageFromOption(option),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.secondary,
+                        foregroundColor: theme.colorScheme.onSecondary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        option,
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           Padding(
             padding: const EdgeInsets.all(8.0),

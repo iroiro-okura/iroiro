@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
             Container(
               color: Theme.of(context).colorScheme.tertiary,
               child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
                       Row(
@@ -48,8 +48,9 @@ class HomeScreen extends StatelessWidget {
                               Center(
                                 child: Image.asset(
                                   'assets/images/cogimi.png',
-                                  height: 150,
-                                  width: 160,
+                                  height:
+                                      MediaQuery.of(context).size.height / 6,
+                                  width: MediaQuery.of(context).size.width / 3,
                                 ),
                               ),
                               Text('AIコーギー：こぎ美',
