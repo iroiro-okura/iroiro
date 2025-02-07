@@ -22,20 +22,33 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
-  Chat? targetChat;
   Message? _lastMessage;
+  ChatProvider? _chatProvider;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    targetChat = chatProvider.chat;
+    final chatProvider = Provider.of<ChatProvider>(context);
+    if (_chatProvider != chatProvider) {
+      _chatProvider?.removeListener(_onChatArgumentChanged);
+      _chatProvider = chatProvider;
+      _chatProvider?.addListener(_onChatArgumentChanged);
+    }
+  }
+
+  void _onChatArgumentChanged() {
+    if (mounted) {
+      setState(() {
+        _lastMessage = null;
+      });
+    }
   }
 
   @override
   void dispose() {
+    _chatProvider?.removeListener(_onChatArgumentChanged);
     _scrollController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -45,6 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _sendMessage() async {
+    final targetChat = _chatProvider?.chat;
     if (_controller.text.isNotEmpty && targetChat?.chatId != null) {
       FirestoreService.sendMessage(
         targetChat!.chatId,
@@ -61,19 +75,23 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _sendMessageFromOption(String option) async {
-    FirestoreService.sendMessage(
-      targetChat!.chatId,
-      Message(
-        sender: Sender.user,
-        text: option,
-        status: Status.completed,
-        sentAt: DateTime.now(),
-        isReplyAllowed: false,
-      ),
-    );
-    setState(() {
-      _lastMessage = null;
-    });
+    final targetChat = _chatProvider?.chat;
+    if (targetChat?.chatId != null) {
+      final chatId = targetChat!.chatId;
+      FirestoreService.sendMessage(
+        chatId,
+        Message(
+          sender: Sender.user,
+          text: option,
+          status: Status.completed,
+          sentAt: DateTime.now(),
+          isReplyAllowed: false,
+        ),
+      );
+      setState(() {
+        _lastMessage = null;
+      });
+    }
   }
 
   Widget _buildAvatar(String name, bool isUser, Status? status) {
@@ -94,8 +112,8 @@ class _ChatScreenState extends State<ChatScreen> {
               : status == Status.failed
                   ? 'assets/images/cogimi_sad.png'
                   : 'assets/images/cogimi.png',
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           fit: BoxFit.cover,
         ),
       );

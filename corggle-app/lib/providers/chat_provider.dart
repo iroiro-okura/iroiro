@@ -21,5 +21,14 @@ class ChatProvider with ChangeNotifier {
 
   Future<void> createNewChat(String uid, String scene) async {
     _chat = await FirestoreService.createChat(uid, scene, "");
+    notifyListeners();
+  }
+
+  Future<void> getChat(String chatId) async {
+    final pastChat = await FirestoreService.getChat(chatId);
+    if (pastChat != null) {
+      _chat = pastChat;
+    }
+    notifyListeners();
   }
 }
