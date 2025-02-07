@@ -195,7 +195,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           child: message.status == Status.inProgress
                               ? const AnimatedDots()
-                              : message.status == Status.sent
+                              : message.status == Status.completed
                                   ? Text(message.text)
                                   : Text(
                                       "エラーが発生しました",
