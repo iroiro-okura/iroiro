@@ -89,6 +89,7 @@ flutter:
     - assets/icon/icon_transparent.png
     - assets/images/cogimi.png
     - assets/images/cogimi_thinking.png
+    - assets/images/cogimi_sad.png
     - assets/images/dating.png
     - assets/images/reunion.jpeg
     - assets/images/welcome_party.jpeg

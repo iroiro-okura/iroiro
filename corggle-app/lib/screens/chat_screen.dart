@@ -81,17 +81,19 @@ class _ChatScreenState extends State<ChatScreen> {
       return ClipOval(
         child: SvgPicture.string(
           RandomAvatarString(name),
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           fit: BoxFit.cover,
         ),
       );
     } else {
       return ClipRRect(
         child: Image.asset(
-          status == "inProgress"
+          status == Status.inProgress
               ? 'assets/images/cogimi_thinking.png'
-              : 'assets/images/cogimi.png',
+              : status == Status.failed
+                  ? 'assets/images/cogimi_sad.png'
+                  : 'assets/images/cogimi.png',
           width: 40,
           height: 40,
           fit: BoxFit.cover,
@@ -118,7 +120,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final uid = userProvider.user!.uid;
 
     chatProvider.createNewChat(uid, "");
-    chatProvider.setTopic("");
+    chatProvider.setScene("");
   }
 
   @override

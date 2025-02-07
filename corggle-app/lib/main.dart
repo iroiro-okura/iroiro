@@ -129,7 +129,7 @@ class _MainPageState extends State<MainPage> {
 
     _controller.addListener(() {
       if (_controller.index == 0) {
-        Provider.of<ChatProvider>(context, listen: false).resetTopic();
+        Provider.of<ChatProvider>(context, listen: false).resetScene();
       }
     });
   }
@@ -137,7 +137,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _loadUserProfile() async {
     final user = AuthService.auth.currentUser;
     if (user != null) {
-      final userProfile =await FirestoreService.getUser();
+      final userProfile = await FirestoreService.getUser();
       if (!mounted) return;
       if (userProfile != null) {
         Provider.of<UserProvider>(context, listen: false).setUser(userProfile);

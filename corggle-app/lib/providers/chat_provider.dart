@@ -3,23 +3,23 @@ import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/model/chat.dart';
 
 class ChatProvider with ChangeNotifier {
-  String _topic = '';
+  String _scene = '';
   late Chat _chat;
 
-  String get argument => _topic;
+  String get argument => _scene;
   Chat get chat => _chat;
 
-  void setTopic(String topic) {
-    _topic = topic;
+  void setScene(String scene) {
+    _scene = scene;
     notifyListeners();
   }
 
-  void resetTopic() {
-    _topic = '';
+  void resetScene() {
+    _scene = '';
     notifyListeners();
   }
 
-  Future<void> createNewChat(String uid, String topic) async {
-    _chat = await FirestoreService.createChat(uid, topic, "");
+  Future<void> createNewChat(String uid, String scene) async {
+    _chat = await FirestoreService.createChat(uid, scene, "");
   }
 }

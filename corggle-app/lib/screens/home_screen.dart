@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     await chatProvider.createNewChat(userProvider.user!.uid, topic);
-    chatProvider.setTopic(topic);
+    chatProvider.setScene(topic);
     controller.jumpToTab(1);
   }
 
