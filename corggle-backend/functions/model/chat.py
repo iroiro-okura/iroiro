@@ -1,4 +1,4 @@
-import datetime
+import dataclasses
 from enum import Enum 
 from firebase_functions import firestore_fn
 
@@ -31,10 +31,10 @@ class Scene(Enum):
     else:
       raise ValueError(f"Unknown scene: {scene}")
 
+@dataclasses.dataclass
 class Chat:
-  def __init__(self, uid: str, scene: Scene):
-    self.uid = uid
-    self.scene = scene
+  uid: str
+  scene: Scene
   
   @classmethod
   def from_snapshot(cls, snapshot: firestore_fn.DocumentSnapshot) -> 'Chat':

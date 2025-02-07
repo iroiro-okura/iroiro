@@ -1,13 +1,15 @@
 from firebase_admin import firestore
 
-from model import Message, SentMessage, Status, User
-
 db = firestore.client()
+
+from model import Message, SentMessage, Status, User
 
 def get_user(uid: str) -> User:
   """Firestore からユーザー情報を取得する"""
   user_ref = db.collection('users').document(uid).get()
-  return User.from_snapshot(user_ref)
+  if (user_ref is None):
+    return None
+  return User.from_snapshot(uid, user_ref)
 
 def get_messages(chat_id: str) -> list[Message]:
   """Firestore からチャットのメッセージを取得する"""
@@ -27,7 +29,7 @@ def add_message(chat_id: str, message: SentMessage) -> None:
     'isReplyAllowed': message.is_reply_allowed,
     'answerOptions': message.answer_options
   })
-  print(f"Message saved to Firestore: {message_ref.id}")
+  print(f"Message saved to Firestore: chat_id: {chat_id} message: {message}")
 
 def update_message(chat_id: str, message_id: str, message: SentMessage) -> None:
   """Firestore のメッセージを更新する"""

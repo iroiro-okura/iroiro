@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 from enum import Enum
 from firebase_functions import firestore_fn
@@ -27,30 +28,29 @@ class Status(Enum):
         return member
     return cls.UNKNOWN
 
+@dataclasses.dataclass
 class Message:
-  def __init__(self, sender: Sender, status: Status, text: str, sent_at: datetime.datetime):
-    self.sender = sender
-    self.status = status
-    self.text = text
-    self.sent_at = sent_at
+  sender: Sender
+  status: Status
+  text: str
+  sent_at: datetime.datetime
   
   @classmethod
   def from_snapshot(cls, snapshot: firestore_fn.DocumentSnapshot) -> 'Message':
     """SnapshotからMessageインスタンスを作成するファクトリメソッド"""
     data = snapshot.to_dict()
-    sent_at = data.get('sentAt').to_datetime()
+    sent_at = data.get('sentAt')
     return cls(
       sender=Sender.value_of(data.get('sender')),
       status=Status.value_of(data.get('status')),
       text=data.get('text', ''),
-      sent_at=sent_at
+      sent_at=datetime.datetime.fromtimestamp(sent_at.timestamp())
     )
 
+@dataclasses.dataclass
 class SentMessage(Message):
-  def __init__(self, sender: Sender, status: Status, text: str, sent_at: datetime.datetime, is_reply_allowed: bool, answer_options: list[str]):
-    super().__init__(sender, status, text, sent_at)
-    self.is_reply_allowed = is_reply_allowed
-    self.answer_options = answer_options
+  is_reply_allowed: bool
+  answer_options: list[str]
 
   @classmethod
   def in_progress(cls) -> 'SentMessage':
@@ -58,7 +58,7 @@ class SentMessage(Message):
     return cls(
       sender=Sender.MODEL,
       status=Status.IN_PROGRESS,
-      text="...",
+      text="...(ちょっとまっててコギ)",
       sent_at=datetime.datetime.now(),
       is_reply_allowed=False,
       answer_options=[]
@@ -77,14 +77,14 @@ class SentMessage(Message):
     )
   
   @classmethod
-  def completed(cls, text: str, answer_options: list[str] = []) -> 'SentMessage':
+  def completed(cls, text: str, is_repliy_allowed = True, answer_options: list[str] = []) -> 'SentMessage':
     """完了のメッセージを作成する"""
     return cls(
       sender=Sender.MODEL,
       status=Status.COMPLETED,
       text=text,
       sent_at=datetime.datetime.now(),
-      is_reply_allowed=True,
+      is_reply_allowed=is_repliy_allowed,
       answer_options=answer_options
     )
 
