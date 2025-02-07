@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
@@ -22,7 +20,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  Message? _lastMessage;
   ChatProvider? _chatProvider;
 
   @override
@@ -30,31 +27,15 @@ class _ChatScreenState extends State<ChatScreen> {
     super.didChangeDependencies();
     final chatProvider = Provider.of<ChatProvider>(context);
     if (_chatProvider != chatProvider) {
-      _chatProvider?.removeListener(_onChatArgumentChanged);
       _chatProvider = chatProvider;
-      _chatProvider?.addListener(_onChatArgumentChanged);
-    }
-  }
-
-  void _onChatArgumentChanged() {
-    if (mounted) {
-      setState(() {
-        _lastMessage = null;
-      });
     }
   }
 
   @override
   void dispose() {
-    _chatProvider?.removeListener(_onChatArgumentChanged);
     _scrollController.dispose();
     _controller.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   void _sendMessage() async {
@@ -88,9 +69,6 @@ class _ChatScreenState extends State<ChatScreen> {
           isReplyAllowed: false,
         ),
       );
-      setState(() {
-        _lastMessage = null;
-      });
     }
   }
 
@@ -172,19 +150,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
 
                 final messages = snapshot.data;
-                final lastMessage = messages!.last;
-                logger.i('Last message: $lastMessage');
-
-                if (_lastMessage == null ||
-                    _lastMessage!.text != lastMessage.text) {
-                  Future.microtask(() {
-                    if (mounted) {
-                      setState(() {
-                        _lastMessage = lastMessage;
-                      });
-                      _scrollToBottom();
-                    }
-                  });
+                if (messages == null || messages.isEmpty) {
+                  return const Center(child: Text('チャット履歴はありません。'));
                 }
 
                 return ListView.builder(
@@ -197,75 +164,81 @@ class _ChatScreenState extends State<ChatScreen> {
                     final isUser = message.sender == Sender.user;
                     final status = message.status;
 
-                    return Align(
-                      alignment:
-                          isUser ? Alignment.centerRight : Alignment.centerLeft,
-                      child: ListTile(
-                        leading:
-                            isUser ? null : _buildAvatar(name, false, status),
-                        trailing:
-                            isUser ? _buildAvatar(name, true, null) : null,
-                        title: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: isUser
-                                ? theme.colorScheme.primary.withAlpha(50)
-                                : theme.colorScheme.tertiary,
-                            borderRadius: BorderRadius.circular(10),
+                    return Column(children: [
+                      Align(
+                        alignment: isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: ListTile(
+                          leading:
+                              isUser ? null : _buildAvatar(name, false, status),
+                          trailing:
+                              isUser ? _buildAvatar(name, true, null) : null,
+                          title: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: isUser
+                                  ? theme.colorScheme.primary.withAlpha(50)
+                                  : theme.colorScheme.tertiary,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: message.status == Status.inProgress
+                                ? const AnimatedDots()
+                                : message.status == Status.completed
+                                    ? Text(message.text)
+                                    : Text(
+                                        "エラーが発生しました",
+                                        style: TextStyle(
+                                            color: theme.colorScheme.error),
+                                      ),
                           ),
-                          child: message.status == Status.inProgress
-                              ? const AnimatedDots()
-                              : message.status == Status.completed
-                                  ? Text(message.text)
-                                  : Text(
-                                      "エラーが発生しました",
-                                      style: TextStyle(
-                                          color: theme.colorScheme.error),
-                                    ),
                         ),
                       ),
-                    );
+                      if (messages.last.answerOptions != null)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Wrap(
+                            spacing: 8.0,
+                            runSpacing: 8.0,
+                            alignment: WrapAlignment.center,
+                            children:
+                                messages.last.answerOptions!.map((option) {
+                              return SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: ElevatedButton(
+                                  onPressed: () =>
+                                      _sendMessageFromOption(option),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        theme.colorScheme.secondary,
+                                    foregroundColor:
+                                        theme.colorScheme.onSecondary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    option,
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                    ]);
                   },
                 );
               },
             ),
           ),
-          if (_lastMessage != null && _lastMessage!.answerOptions != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                alignment: WrapAlignment.center,
-                children: _lastMessage!.answerOptions!.map((option) {
-                  return SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.45,
-                    child: ElevatedButton(
-                      onPressed: () => _sendMessageFromOption(option),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.secondary,
-                        foregroundColor: theme.colorScheme.onSecondary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: Text(
-                        option,
-                        softWrap: true,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: <Widget>[
                 Expanded(
                   child: TextField(
-                    enabled: _lastMessage?.isReplyAllowed,
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'メッセージを入力',

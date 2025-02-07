@@ -38,7 +38,8 @@ class MyApp extends StatelessWidget {
           title: 'Corggle',
           routes: {
             '/chat': (context) => const ChatScreen(),
-            '/history': (context) => const HistoryScreen(),
+            '/history': (context) =>
+                HistoryScreen(controller: PersistentTabController()),
             '/account': (context) => const AccountScreen(),
           },
           theme: ThemeData(
@@ -123,7 +124,7 @@ class _MainPageState extends State<MainPage> {
     _screens = [
       HomeScreen(controller: _controller),
       ChatScreen(),
-      HistoryScreen(),
+      HistoryScreen(controller: _controller),
       AccountScreen()
     ];
 
