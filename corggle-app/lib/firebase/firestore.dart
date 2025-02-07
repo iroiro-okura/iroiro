@@ -102,7 +102,7 @@ class FirestoreService {
     );
 
     // Use the sendMessage function to save the initial message
-    await sendMessage(docRef.id, message);
+    // await sendMessage(docRef.id, message);
 
     Chat? chat = await getChat(docRef.id);
     if (chat == null) {
