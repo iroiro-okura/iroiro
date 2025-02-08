@@ -96,8 +96,7 @@ class HomeScreen extends StatelessWidget {
                       Column(
                         children: [
                           InkWell(
-                              onTap: () =>
-                                  _handleTap(context, Topic.dating.name),
+                              onTap: () => _handleTap(context, dating),
                               child: Container(
                                 height: 110,
                                 width: 110,
@@ -125,8 +124,7 @@ class HomeScreen extends StatelessWidget {
                       Column(
                         children: [
                           InkWell(
-                            onTap: () =>
-                                _handleTap(context, Topic.reunion.name),
+                            onTap: () => _handleTap(context, reunion),
                             child: Container(
                               height: 110,
                               width: 110,
@@ -155,8 +153,8 @@ class HomeScreen extends StatelessWidget {
                       Column(
                         children: [
                           InkWell(
-                              onTap: () => _handleTap(
-                                  context, Topic.companyGathering.name),
+                              onTap: () =>
+                                  _handleTap(context, companyGathering),
                               child: Container(
                                 height: 110,
                                 width: 110,

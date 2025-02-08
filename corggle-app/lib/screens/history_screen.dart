@@ -6,6 +6,7 @@ import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class HistoryScreen extends StatefulWidget {
   final PersistentTabController controller;
@@ -37,22 +38,50 @@ class _HistoryScreenState extends State<HistoryScreen> {
             return const Center(child: Text('チャット履歴はありません。'));
           }
 
-          return ListView.builder(
-            itemCount: chats.length,
-            itemBuilder: (context, index) {
-              final chat = chats[index];
-              return ListTile(
-                title: Text(chat.createdAt.toString()),
-                subtitle: Text(chat.scene),
-                onTap: () {
-                  final chatProvider =
-                      Provider.of<ChatProvider>(context, listen: false);
-                  chatProvider.getChat(chat.chatId);
-                  chatProvider.setScene(chat.scene);
-                  widget.controller.jumpToTab(1); // Navigate to chat tab
-                },
-              );
-            },
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'チャット履歴: ${chats.length}件',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: chats.length,
+                  itemBuilder: (context, index) {
+                    final chat = chats[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                      child: ListTile(
+                        leading: Icon(Icons.chat,
+                            color: Theme.of(context).colorScheme.primary),
+                        title: Text(
+                          DateFormat('yyyy/MM/dd HH:mm').format(chat.createdAt),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(chat.scene),
+                        trailing: Icon(Icons.arrow_forward_ios,
+                            color: Theme.of(context).colorScheme.secondary),
+                        onTap: () {
+                          final chatProvider =
+                              Provider.of<ChatProvider>(context, listen: false);
+                          chatProvider.getChat(chat.chatId);
+                          chatProvider.setScene(chat.scene);
+                          widget.controller
+                              .jumpToTab(1); // Navigate to chat tab
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),

@@ -81,4 +81,6 @@ enum Sender {
   user,
 }
 
-enum Topic { dating, reunion, companyGathering }
+const dating = "初めてのデート";
+const reunion = "同窓会";
+const companyGathering = "会社の懇親会";

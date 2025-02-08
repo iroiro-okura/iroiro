@@ -28,12 +28,14 @@ class _ChatScreenState extends State<ChatScreen> {
     _initializeChat();
   }
 
-  void _initializeChat() {
+  void _initializeChat() async {
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final uid = userProvider.user!.uid;
+    if (chatProvider.chat == null) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final uid = userProvider.user!.uid;
 
-    chatProvider.createNewChat(uid, "");
+      await chatProvider.createNewChat(uid, "");
+    }
   }
 
   @override

@@ -88,49 +88,28 @@ class _AccountScreenState extends State<AccountScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                TextField(
-                  controller: usernameController,
-                  decoration: const InputDecoration(labelText: 'Username'),
+                _buildTextField(usernameController, 'ユーザー名'),
+                const SizedBox(height: 8),
+                const Text(
+                  'ユーザー名を変更するとアバターも変わります。',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
-                DropdownButtonFormField<Gender>(
-                  value: gender.isNotEmpty
-                      ? Gender.values.firstWhere(
-                          (e) => e.toString().split('.').last == gender)
-                      : null,
-                  decoration: const InputDecoration(labelText: 'Gender'),
-                  items: Gender.values
-                      .map((label) => DropdownMenuItem(
-                            value: label,
-                            child: Text(label.toString().split('.').last),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      gender = value?.toString().split('.').last ?? '';
-                    });
-                  },
-                ),
-                TextField(
-                  controller: ageController,
-                  decoration: const InputDecoration(labelText: 'Age'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: occupationController,
-                  decoration: const InputDecoration(labelText: 'Occupation'),
-                ),
+                const SizedBox(height: 8),
+                _buildDropdownButtonFormField(gender),
+                _buildTextField(ageController, '年齢', TextInputType.number),
+                _buildTextField(occupationController, '職業'),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('キャンセル'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Save'),
+              child: const Text('保存'),
               onPressed: () async {
                 setState(() {
                   _username = usernameController.text;
@@ -147,6 +126,62 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
         );
       },
+    );
+  }
+
+  String _getGenderDisplayName(String gender) {
+    switch (gender) {
+      case 'male':
+        return '男性';
+      case 'female':
+        return '女性';
+      default:
+        return 'その他';
+    }
+  }
+
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      [TextInputType keyboardType = TextInputType.text]) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: labelText),
+      keyboardType: keyboardType,
+    );
+  }
+
+  Widget _buildDropdownButtonFormField(String gender) {
+    return DropdownButtonFormField<Gender>(
+      value: gender.isNotEmpty
+          ? Gender.values
+              .firstWhere((e) => e.toString().split('.').last == gender)
+          : null,
+      decoration: const InputDecoration(labelText: '性別'),
+      items: Gender.values
+          .map((label) => DropdownMenuItem(
+                value: label,
+                child: Text(
+                    _getGenderDisplayName(label.toString().split('.').last)),
+              ))
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _gender = value?.toString().split('.').last ?? '';
+        });
+      },
+    );
+  }
+
+  Widget _buildProfileCard(IconData icon, String title, String content) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        title: Text('$title: $content'),
+      ),
     );
   }
 
@@ -179,35 +214,11 @@ class _AccountScreenState extends State<AccountScreen> {
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               if (_gender.isNotEmpty)
-                Card(
-                  elevation: 2,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-                  child: ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('性別: $_gender'),
-                  ),
-                ),
-              if (_age != 0)
-                Card(
-                  elevation: 2,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-                  child: ListTile(
-                    leading: Icon(Icons.cake),
-                    title: Text('年齢: $_age'),
-                  ),
-                ),
+                _buildProfileCard(
+                    Icons.person, '性別', _getGenderDisplayName(_gender)),
+              if (_age != 0) _buildProfileCard(Icons.cake, '年齢', '$_age'),
               if (_occupation.isNotEmpty)
-                Card(
-                  elevation: 2,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-                  child: ListTile(
-                    leading: Icon(Icons.work),
-                    title: Text('職業: $_occupation'),
-                  ),
-                ),
+                _buildProfileCard(Icons.work, '職業', _occupation),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _editProfile,
