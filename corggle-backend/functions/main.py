@@ -1,5 +1,8 @@
 from firebase_admin import initialize_app, credentials
 from lib import initialize_db, initialize_gemini
+from model import User, Gender
+
+import os
 
 initialize_app(credential=credentials.ApplicationDefault())
 

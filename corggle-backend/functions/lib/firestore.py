@@ -8,7 +8,6 @@ class Firestore:
   _instance = None
 
   def __new__(cls, *args, **kwargs):
-    print("Firestore __new__ called")  # デバッグ用のprint文を追加
     if not cls._instance:
       cls._instance = super(Firestore, cls).__new__(cls, *args, **kwargs)
       cls._instance.db = firestore.client()
@@ -21,7 +20,7 @@ class Firestore:
     if not user_ref.exists:
       return None
     return User.from_snapshot(uid, user_ref)
-
+  
   @classmethod
   def get_messages(cls, chat_id: str) -> list[Message]:
     """Firestore からチャットのメッセージを取得する"""

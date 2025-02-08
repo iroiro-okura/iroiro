@@ -65,12 +65,12 @@ class SentMessage(Message):
     )
   
   @classmethod
-  def failed(cls) -> 'SentMessage':
+  def failed(cls, text=None) -> 'SentMessage':
     """読み込み失敗のメッセージを作成する"""
     return cls(
       sender=Sender.MODEL,
       status=Status.FAILED,
-      text="読み込みに失敗しちゃったみたい...もう一度試してみてね！",
+      text=text if text else "読み込みに失敗しちゃったみたい...もう一度試してみてね！",
       sent_at=datetime.datetime.now(),
       is_reply_allowed=True,
       answer_options=[]

@@ -1,6 +1,7 @@
 import google.generativeai as genai
 from dataclasses import dataclass
 from enum import Enum
+import os
 
 from model import User, Chat, Message
 
@@ -12,7 +13,6 @@ def initialize_gemini():
 class ResponseStatus(Enum):
   SUCCESS = "success"
   ERROR = "error"
-  IN_PROGRESS = "in_progress"
 
 @dataclass
 class Response:
@@ -26,7 +26,13 @@ class Gemini:
     if not cls._instance:
       cls._instance = super(Gemini, cls).__new__(cls, *args, **kwargs)
       # Gemini API キーの取得
-      GEMINI_API_KEY = SecretParam('GEMINI_API_KEY')
+      if os.getenv("ENV", "") == "local":
+        GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+      else:
+        GEMINI_API_KEY = SecretParam('GEMINI_API_KEY')
+      if (not GEMINI_API_KEY):
+        raise ValueError("Gemini API key not found.")
+      print(f"Initializing Gemini with API key: {GEMINI_API_KEY}")
       genai.configure(api_key=GEMINI_API_KEY)
       cls.model = genai.GenerativeModel("models/gemini-2.0-pro-exp")
     return cls._instance
@@ -39,19 +45,20 @@ class Gemini:
     """Gemini にプロンプトを投げてレスポンスを生成する"""
 
     # Gemini に投げるプロンプトを作成
-    prompt = f"""
-    あなたは犬のコーギーのコギ美ちゃんです。犬だけど人間の相談相手になってあげて欲しい。
-    相談者は友達や恋人、同僚と何を話せばいいのか話題に困っている。
-    以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
+    prompt = f"""あなたは犬のコーギーのコギ美ちゃんです。犬だけど人間の相談相手になってあげて欲しい。
+相談者は友達や恋人、同僚と何を話せばいいのか話題に困っている。
+以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
 
-    ユーザー情報:
-    名前: {user.name}
-    年齢: {user.age}
-    性別: {user.gender.value}
-    職業: {user.occupation}
+以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
 
-    場面: {chat.scene.display_name()}
-    """
+ユーザー情報:
+名前: {user.name}
+年齢: {user.age}
+性別: {user.gender.value}
+職業: {user.occupation}
+
+場面: {chat.scene}
+"""
 
     history = [{"role": msg.sender.value, "parts": msg.text} for msg in message_history]
 
@@ -60,7 +67,10 @@ class Gemini:
       chat_session = cls.model.start_chat(
         history=[{"role": "user", "parts": prompt}] + history
       )
-      response = chat_session.send_message(user_message if user_message.text else "続きを聞かせて？")
+      response = chat_session.send_message(
+        user_message.text if (user_message and user_message.text) else "続きを聞かせて？",
+      )
+      print(f"Successfully generated Gemini response!! response: {response.text}")
       return Response(text=response.text, status=ResponseStatus.SUCCESS)
     except Exception as e:
       print(f"Error generating Gemini response: {e}")
