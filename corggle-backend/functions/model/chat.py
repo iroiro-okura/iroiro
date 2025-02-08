@@ -29,7 +29,7 @@ class Scene(Enum):
     elif scene == cls.COMPANYGATHERING:
       return "会社の懇親会"
     else:
-      raise ValueError(f"Unknown scene: {scene}")
+      return None
 
 @dataclasses.dataclass
 class Chat:

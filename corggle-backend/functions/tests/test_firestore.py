@@ -1,7 +1,14 @@
 import unittest
 from unittest.mock import patch, MagicMock
+
+# The Firebase Admin SDK to access Cloud Firestore.
+from firebase_admin import initialize_app, get_app, _apps
+
+app = initialize_app()
+
 from lib.firestore import get_user, get_messages, add_message, update_message
 from model import User, SentMessage, Sender, Status
+
 
 class TestFirestoreFunctions(unittest.TestCase):
 
@@ -18,6 +25,7 @@ class TestFirestoreFunctions(unittest.TestCase):
     mock_user_ref = MagicMock()
     mock_user_ref.exists = False
     mock_db.collection.return_value.document.return_value.get.return_value = mock_user_ref
+    mock_db.collection.return_value.document.return_value.get.return_value.to_dict.return_value = None
     user = get_user('test_uid')
     self.assertIsNone(user)
 

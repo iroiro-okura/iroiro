@@ -7,7 +7,7 @@ from model import Message, SentMessage, Status, User
 def get_user(uid: str) -> User:
   """Firestore からユーザー情報を取得する"""
   user_ref = db.collection('users').document(uid).get()
-  if (user_ref is None):
+  if not user_ref.exists:
     return None
   return User.from_snapshot(uid, user_ref)
 
@@ -19,7 +19,7 @@ def get_messages(chat_id: str) -> list[Message]:
     messages.append(Message.from_snapshot(message))
   return messages
 
-def add_message(chat_id: str, message: SentMessage) -> None:
+def add_message(chat_id: str, message: SentMessage) -> str:
   """Firestore にメッセージを追加する"""
   message_ref = db.collection('chats').document(chat_id).collection('messages').add({
     'sender': message.sender.value,
@@ -29,7 +29,9 @@ def add_message(chat_id: str, message: SentMessage) -> None:
     'isReplyAllowed': message.is_reply_allowed,
     'answerOptions': message.answer_options
   })
-  print(f"Message saved to Firestore: chat_id: {chat_id} message: {message}")
+  message_id = message_ref[1].id
+  print(f"Message added to Firestore: chat_id: {chat_id} message_id: {message_id} message: {message}")
+  return message_id
 
 def update_message(chat_id: str, message_id: str, message: SentMessage) -> None:
   """Firestore のメッセージを更新する"""

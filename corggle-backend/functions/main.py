@@ -1,17 +1,13 @@
 # The Firebase Admin SDK to access Cloud Firestore.
 from firebase_admin import initialize_app, get_app, _apps
 
-if not _apps:
-    app = initialize_app()
-else:
-    app = get_app()
+app = initialize_app()
 
 # The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
 from firebase_functions import firestore_fn
 
 from application import start_chat, reply_to_message
 from model import Message, Sender, Status, Chat
-from lib.firestore import get_messages
 
 # Cloud Functions のトリガー設定
 @firestore_fn.on_document_created(document="chats/{chatId}")
