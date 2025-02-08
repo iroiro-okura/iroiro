@@ -150,6 +150,20 @@ class FirestoreService {
     }).toList();
   }
 
+  static Stream<List<Chat>> chatStream(String uid) {
+    logger.i('Listening to chats for user $uid');
+    return db
+        .collection('chats')
+        .where('uid', isEqualTo: uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Chat.fromJson(doc.id, doc.data());
+      }).toList();
+    });
+  }
+
   static Stream<List<Message>> messageStream(String chatId) {
     logger.i('Listening to messages for chat $chatId');
     return db
