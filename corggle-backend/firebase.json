@@ -1,7 +1,6 @@
 {
   "functions": {
     "source": "functions",
-    "region": "asia-northeast1",
     "codebase": "default",
     "ignore": [
       "venv",

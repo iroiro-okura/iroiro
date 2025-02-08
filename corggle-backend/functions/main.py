@@ -1,27 +1,31 @@
-# The Firebase Admin SDK to access Cloud Firestore.
-from firebase_admin import initialize_app, get_app, _apps
+from firebase_admin import initialize_app, credentials
+from lib import initialize_db, initialize_gemini
 
-app = initialize_app()
+initialize_app(credential=credentials.ApplicationDefault())
 
-# The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
-from firebase_functions import firestore_fn
+def setup():
+  initialize_db()
+  initialize_gemini()
 
 from application import start_chat, reply_to_message
 from model import Message, Sender, Status, Chat
 
 # Cloud Functions のトリガー設定
-@firestore_fn.on_document_created(document="chats/{chatId}")
+from firebase_functions import firestore_fn
+
+@firestore_fn.on_document_created(document="chats/{chatId}", region="asia-northeast1")
 def onchatcreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
   """Firestore のチャットが作成されたときに実行される関数"""
   print(f"onchatcreated: {event}")
   chat_id = event.params['chatId']
   chat = Chat.from_snapshot(event.data)
+  setup()
   start_chat(chat_id, chat)
   
   print(f"onchatcreated: id: {chat_id}, data: {chat}")
 
-@firestore_fn.on_document_created(document="chats/{chatId}/messages/{messageId}")
-def onchatmessagecreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
+@firestore_fn.on_document_created(document="chats/{chatId}/messages/{messageId}", region="asia-northeast1")
+def onmessagecreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
   """Firestore のチャットメッセージが作成されたときに実行される関数"""
   print(f"onchatmessagecreated: {event}")
   chat_id = event.params['chatId']
@@ -30,6 +34,7 @@ def onchatmessagecreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot
   if (message.sender == Sender.MODEL or message.status != Status.COMPLETED):
     print(f"onchatmessagecreated: skip")
     return
+  setup()
   print(f"onchatmessagecreated: {message.text} in chat {chat_id} with message {message_id}")
 
 if __name__ == '__main__':
