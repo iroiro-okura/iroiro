@@ -4,10 +4,10 @@ import 'package:iroiro/model/chat.dart';
 
 class ChatProvider with ChangeNotifier {
   String _scene = '';
-  late Chat _chat;
+  Chat? _chat;
 
   String get argument => _scene;
-  Chat get chat => _chat;
+  Chat? get chat => _chat;
 
   void setScene(String scene) {
     _scene = scene;

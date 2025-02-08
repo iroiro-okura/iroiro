@@ -23,6 +23,20 @@ class _ChatScreenState extends State<ChatScreen> {
   ChatProvider? _chatProvider;
 
   @override
+  void initState() {
+    super.initState();
+    _initializeChat();
+  }
+
+  void _initializeChat() {
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final uid = userProvider.user!.uid;
+
+    chatProvider.createNewChat(uid, "");
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final chatProvider = Provider.of<ChatProvider>(context);
@@ -138,101 +152,107 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           const Gap(20),
-          Expanded(
-            child: StreamBuilder<List<Message>>(
-              stream: FirestoreService.messageStream(chatProvider.chat.chatId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: AnimatedDots());
-                }
+          if (chatProvider.chat == null)
+            const CircularProgressIndicator()
+          else
+            Expanded(
+              child: StreamBuilder<List<Message>>(
+                stream:
+                    FirestoreService.messageStream(chatProvider.chat!.chatId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: AnimatedDots());
+                  }
 
-                final messages = snapshot.data;
-                if (messages == null || messages.isEmpty) {
-                  return const Center(child: Text('チャット履歴はありません。'));
-                }
+                  final messages = snapshot.data;
+                  if (messages == null || messages.isEmpty) {
+                    return const Center(child: Text('チャット履歴はありません。'));
+                  }
 
-                return ListView.builder(
-                  itemCount: messages.length,
-                  cacheExtent: 1000,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: _scrollController,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    final isUser = message.sender == Sender.user;
-                    final status = message.status;
+                  return ListView.builder(
+                    itemCount: messages.length,
+                    cacheExtent: 1000,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: _scrollController,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      final isUser = message.sender == Sender.user;
+                      final status = message.status;
 
-                    return Column(children: [
-                      Align(
-                        alignment: isUser
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: ListTile(
-                          leading:
-                              isUser ? null : _buildAvatar(name, false, status),
-                          trailing:
-                              isUser ? _buildAvatar(name, true, null) : null,
-                          title: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: isUser
-                                  ? theme.colorScheme.primary.withAlpha(50)
-                                  : theme.colorScheme.tertiary,
-                              borderRadius: BorderRadius.circular(10),
+                      return Column(children: [
+                        Align(
+                          alignment: isUser
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: ListTile(
+                            leading: isUser
+                                ? null
+                                : _buildAvatar(name, false, status),
+                            trailing:
+                                isUser ? _buildAvatar(name, true, null) : null,
+                            title: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isUser
+                                    ? theme.colorScheme.primary.withAlpha(50)
+                                    : theme.colorScheme.tertiary,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: message.status == Status.inProgress
+                                  ? const AnimatedDots()
+                                  : message.status == Status.completed
+                                      ? Text(message.text)
+                                      : Text(
+                                          "エラーが発生しました",
+                                          style: TextStyle(
+                                              color: theme.colorScheme.error),
+                                        ),
                             ),
-                            child: message.status == Status.inProgress
-                                ? const AnimatedDots()
-                                : message.status == Status.completed
-                                    ? Text(message.text)
-                                    : Text(
-                                        "エラーが発生しました",
-                                        style: TextStyle(
-                                            color: theme.colorScheme.error),
-                                      ),
                           ),
                         ),
-                      ),
-                      if (messages.last.answerOptions != null)
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Wrap(
-                            spacing: 8.0,
-                            runSpacing: 8.0,
-                            alignment: WrapAlignment.center,
-                            children:
-                                messages.last.answerOptions!.map((option) {
-                              return SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.45,
-                                child: ElevatedButton(
-                                  onPressed: () =>
-                                      _sendMessageFromOption(option),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        theme.colorScheme.secondary,
-                                    foregroundColor:
-                                        theme.colorScheme.onSecondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
+                        if (messages.last.answerOptions != null)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              alignment: WrapAlignment.center,
+                              children:
+                                  messages.last.answerOptions!.map((option) {
+                                return SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: ElevatedButton(
+                                    onPressed: () =>
+                                        _sendMessageFromOption(option),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          theme.colorScheme.secondary,
+                                      foregroundColor:
+                                          theme.colorScheme.onSecondary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      option,
+                                      softWrap: true,
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
-                                  child: Text(
-                                    option,
-                                    softWrap: true,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                                );
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                    ]);
-                  },
-                );
-              },
+                      ]);
+                    },
+                  );
+                },
+              ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
