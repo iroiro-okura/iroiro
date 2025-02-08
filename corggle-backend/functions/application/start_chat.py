@@ -1,5 +1,5 @@
 from model import Chat, Scene, SentMessage
-from lib import get_user, add_message, get_messages
+from lib import get_user, add_message, generate_gemini_response
 
 def start_chat(chat_id: str, chat: Chat):
   """新しいチャットを開始する"""
@@ -16,7 +16,9 @@ def start_chat(chat_id: str, chat: Chat):
   add_message(chat_id, initial_message)
   message = SentMessage.in_progress()
   print(f"send in-progress message")
-  message_id = add_message(chat_id, message)
+  in_progress_message_id = add_message(chat_id, message)
+  history = [initial_message]
+  response = generate_gemini_response(user, chat, history, None)
 
 def create_initial_message_text(scene: Scene) -> str:
   initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n"
