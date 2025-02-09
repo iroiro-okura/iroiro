@@ -19,8 +19,7 @@ def reply_to_message(chat_id: str, message_id: str, message: Message):
   # 現在のmessageを除いてhistoryを作成
   history = [msg for msg in messages if msg.message_id != message_id]
   print(f"Generating gemini response")
-  response = Gemini.send_message_to_gemini(user, chat, history, message)
-  message = ""
+  response = Gemini.send_message(user, chat, history, message)
   if (response.status == ResponseStatus.ERROR):
     message = SeningMessage.failed("コギ美がエラーに遭遇したみたいだね。")
     Firestore.update_message(chat_id, reply_message_id, message)
@@ -29,6 +28,11 @@ def reply_to_message(chat_id: str, message_id: str, message: Message):
     Firestore.update_message(chat_id, reply_message_id, message)
   else:
     raise ValueError(f"Invalid response status: {response.status}")
-  print(f"Sent response message {message}")
+  print(f"Generating answer options")
+  answer_options = Gemini.suggest_answer_options(response.chat_session)
+  if (answer_options):
+    message = SeningMessage.from_message(message, is_reply_allowed=True, answer_options=answer_options)
+    Firestore.update_message(chat_id, reply_message_id, message)
+  print(f"Completed: reply to message {message_id}")
 
 __all__ = ['reply_to_message']

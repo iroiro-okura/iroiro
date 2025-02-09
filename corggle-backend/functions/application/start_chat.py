@@ -18,8 +18,7 @@ def start_chat(chat_id: str, chat: Chat):
   reply_message_id = Firestore.add_message(chat_id, SeningMessage.in_progress())
   history = [initial_message]
   print(f"Generating gemini response")
-  response = Gemini.send_message_to_gemini(user, chat, history, None)
-  message = ""
+  response = Gemini.send_message(user, chat, history, None)
   if (response.status == ResponseStatus.ERROR):
     message = SeningMessage.failed("コギ美がエラーに遭遇したみたいだね。")
     Firestore.update_message(chat_id, reply_message_id, message)
@@ -28,7 +27,12 @@ def start_chat(chat_id: str, chat: Chat):
     Firestore.update_message(chat_id, reply_message_id, message)
   else:
     raise ValueError(f"Invalid response status: {response.status}")
-  print(f"Sent response message {message}")
+  print(f"Generating answer options")
+  answer_options = Gemini.suggest_answer_options(response.chat_session)
+  if (answer_options):
+    message = SeningMessage.from_message(message, is_reply_allowed=True, answer_options=answer_options)
+    Firestore.update_message(chat_id, reply_message_id, message)
+  print(f"Completed: starting chat {chat_id}")
 
 def create_initial_message_text(scene: str) -> str:
   initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n"
