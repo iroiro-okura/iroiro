@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:iroiro/components/app_bar.dart';
+import 'package:iroiro/components/help_tooltip.dart';
 import 'package:iroiro/model/chat.dart';
 import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CorggleAppBar(),
-        body: Expanded(
+        body: SingleChildScrollView(
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -64,21 +65,25 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 40),
-                      Center(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 15),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.brown,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 40, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                            ),
+                            onPressed: () {
+                              controller.jumpToTab(1);
+                            },
+                            child: const Text('話題を見つける'),
                           ),
-                          onPressed: () {
-                            controller.jumpToTab(1);
-                          },
-                          child: const Text('話題を見つける'),
-                        ),
+                          const Gap(10),
+                          HelpTooltip(message: '場面は指定せずに、こぎ美との対話で1から話題を探します'),
+                        ],
                       ),
                     ],
                   )),
@@ -88,7 +93,13 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('よくある場面から探す', style: TextStyle(fontSize: 16)),
+                  Row(
+                    children: [
+                      Text('よくある場面から探す', style: TextStyle(fontSize: 16)),
+                      const Gap(10),
+                      HelpTooltip(message: 'よくある場面から話題を探します'),
+                    ],
+                  ),
                   Gap(20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
