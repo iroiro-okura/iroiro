@@ -136,6 +136,15 @@ class FirestoreService {
     });
   }
 
+  static Future<List<Chat>> getAllChats(String uid) async {
+    logger.i('Getting all chats for user $uid');
+    var querySnapshot =
+        await db.collection('chats').where('uid', isEqualTo: uid).get();
+    return querySnapshot.docs.map((doc) {
+      return Chat.fromJson(doc.id, doc.data());
+    }).toList();
+  }
+
   static Future<void> deleteChat(String chatId) async {
     logger.i('Deleting chat $chatId');
     await db.collection('chats').doc(chatId).delete();

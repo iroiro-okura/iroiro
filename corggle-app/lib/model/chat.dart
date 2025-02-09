@@ -6,12 +6,14 @@ class Chat {
   final String uid;
   final String scene;
   final DateTime createdAt;
+  final String? title;
 
   Chat({
     required this.chatId,
     required this.uid,
     required this.scene,
     required this.createdAt,
+    this.title,
   });
 
   factory Chat.fromJson(String chatId, Map<String, dynamic> chatData) {
@@ -20,6 +22,7 @@ class Chat {
       uid: chatData['uid'] as String,
       scene: chatData['scene'] as String,
       createdAt: (chatData['createdAt'] as Timestamp).toDate(),
+      title: chatData['title'] as String?,
     );
   }
 
@@ -30,6 +33,7 @@ class Chat {
       uid: data['uid'] as String,
       scene: data['chatArgument'] as String? ?? 'No scene',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      title: data['title'] as String?,
     );
   }
 }
