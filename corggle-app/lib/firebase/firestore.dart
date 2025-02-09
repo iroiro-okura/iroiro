@@ -136,6 +136,11 @@ class FirestoreService {
     });
   }
 
+  static Future<void> deleteChat(String chatId) async {
+    logger.i('Deleting chat $chatId');
+    await db.collection('chats').doc(chatId).delete();
+  }
+
   static Future<List<Message>?> getMessages(String chatId) async {
     logger.i('Getting messages for chat $chatId');
     var querySnapshot =

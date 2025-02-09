@@ -20,6 +20,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final uid = Provider.of<UserProvider>(context, listen: false).user!.uid;
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
     return Scaffold(
       appBar: CorggleAppBar(),
@@ -63,14 +64,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           vertical: 8.0, horizontal: 16.0),
                       child: ListTile(
                         leading: Icon(Icons.chat,
-                            color: Theme.of(context).colorScheme.primary),
+                            color: Theme.of(context).colorScheme.secondary),
                         title: Text(
                           DateFormat('yyyy/MM/dd HH:mm').format(chat.createdAt),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(chat.scene),
-                        trailing: Icon(Icons.arrow_forward_ios,
-                            color: Theme.of(context).colorScheme.secondary),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete,
+                              color: Theme.of(context).colorScheme.error),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('確認'),
+                                  content: const Text('このチャットを削除しますか？'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: const Text('キャンセル'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: const Text('削除'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (confirm == true) {
+                              chatProvider.deleteChat(chat.chatId);
+                            }
+                          },
+                        ),
                         onTap: () async {
                           final chatProvider =
                               Provider.of<ChatProvider>(context, listen: false);

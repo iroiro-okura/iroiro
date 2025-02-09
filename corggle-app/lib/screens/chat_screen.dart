@@ -232,7 +232,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       child: message.status == Status.inProgress
                                           ? const AnimatedDots()
                                           : message.status == Status.completed
-                                              ? Text(message.text)
+                                              ? SelectableText(message.text)
                                               : Text(
                                                   "エラーが発生しました",
                                                   style: TextStyle(
@@ -268,12 +268,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               Wrap(
                                 spacing: 8.0,
                                 runSpacing: 8.0,
-                                alignment: WrapAlignment.center,
+                                alignment: WrapAlignment.start,
                                 children:
                                     messages.last.answerOptions!.map((option) {
-                                  return SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.45,
+                                  return Expanded(
                                     child: ElevatedButton(
                                       onPressed: () =>
                                           _sendMessageFromOption(option),
@@ -287,11 +285,15 @@ class _ChatScreenState extends State<ChatScreen> {
                                               BorderRadius.circular(20),
                                         ),
                                       ),
-                                      child: Text(
-                                        option,
-                                        softWrap: true,
-                                        textAlign: TextAlign.center,
-                                      ),
+                                      child: Text(option,
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.visible,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color:
+                                                theme.colorScheme.onSecondary,
+                                          )),
                                     ),
                                   );
                                 }).toList(),
@@ -310,6 +312,9 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    textInputAction: TextInputAction.newline,
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'メッセージを入力',

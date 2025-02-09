@@ -31,4 +31,10 @@ class ChatProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> deleteChat(String chatId) async {
+    await FirestoreService.deleteChat(chatId);
+    _chat = null;
+    notifyListeners();
+  }
 }
