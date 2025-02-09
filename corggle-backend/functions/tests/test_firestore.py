@@ -7,7 +7,7 @@ from firebase_admin import initialize_app, get_app, _apps
 app = initialize_app()
 
 from lib.firestore import get_user, get_messages, add_message, update_message
-from model import User, SentMessage, Sender, Status
+from model import User, SeningMessage, Sender, Status
 
 
 class TestFirestoreFunctions(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestFirestoreFunctions(unittest.TestCase):
 
   @patch('lib.firestore.db')
   def test_add_message(self, mock_db):
-    message = SentMessage(
+    message = SeningMessage(
       sender=Sender.USER,
       status=Status.COMPLETED,
       text="Test message",
@@ -51,7 +51,7 @@ class TestFirestoreFunctions(unittest.TestCase):
 
   @patch('lib.firestore.db')
   def test_update_message(self, mock_db):
-    message = SentMessage(
+    message = SeningMessage(
       sender=Sender.USER,
       status=Status.COMPLETED,
       text="Updated message",

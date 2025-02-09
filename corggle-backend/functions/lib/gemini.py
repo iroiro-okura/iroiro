@@ -5,8 +5,6 @@ import os
 
 from model import User, Chat, Message
 
-from firebase_functions.params import SecretParam
-
 def initialize_gemini():
   return Gemini()
 
@@ -26,13 +24,9 @@ class Gemini:
     if not cls._instance:
       cls._instance = super(Gemini, cls).__new__(cls, *args, **kwargs)
       # Gemini API キーの取得
-      if os.getenv("ENV", "") == "local":
-        GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-      else:
-        GEMINI_API_KEY = SecretParam('GEMINI_API_KEY')
+      GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
       if (not GEMINI_API_KEY):
         raise ValueError("Gemini API key not found.")
-      print(f"Initializing Gemini with API key: {GEMINI_API_KEY}")
       genai.configure(api_key=GEMINI_API_KEY)
       cls.model = genai.GenerativeModel("models/gemini-2.0-pro-exp")
     return cls._instance
@@ -49,15 +43,24 @@ class Gemini:
 相談者は友達や恋人、同僚と何を話せばいいのか話題に困っている。
 以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
 
-以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
-
 ユーザー情報:
-名前: {user.name}
-年齢: {user.age}
-性別: {user.gender.value}
-職業: {user.occupation}
+名前: {user.name if user.name else "わからない"}
+年齢: {user.age if user.age else "不明"}
+性別: {user.gender.value if user.gender else "不明"}
+出身地: {user.hometown if user.hometown else "不明"}
+職業: {user.occupation if user.occupation else "不明"}
+趣味: {user.hobbies if user.hobbies else "なし"}
 
+チャット情報:
 場面: {chat.scene}
+時間: {chat.created_at}
+
+注意事項:
+- 日本語での返答をする
+- 会話はフレンドリーで親しみやすく
+- 会話は簡潔でわかりやすく
+- 質問は一度に1つずつ
+- 短めの応答で会話が続くように心がける
 """
 
     history = [{"role": msg.sender.value, "parts": msg.text} for msg in message_history]

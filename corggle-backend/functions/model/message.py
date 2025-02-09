@@ -35,25 +35,31 @@ class Message:
   text: str
   sent_at: datetime.datetime
   
+@dataclasses.dataclass
+class SentMessage(Message):
+  message_id: str
+
   @classmethod
-  def from_snapshot(cls, snapshot: firestore_fn.DocumentSnapshot) -> 'Message':
+  def from_snapshot(cls, snapshot) -> 'SentMessage':
     """SnapshotからMessageインスタンスを作成するファクトリメソッド"""
     data = snapshot.to_dict()
     sent_at = data.get('sentAt')
     return cls(
+      message_id=snapshot.id,
       sender=Sender.value_of(data.get('sender')),
       status=Status.value_of(data.get('status')),
       text=data.get('text', ''),
       sent_at=datetime.datetime.fromtimestamp(sent_at.timestamp())
     )
 
+
 @dataclasses.dataclass
-class SentMessage(Message):
+class SeningMessage(Message):
   is_reply_allowed: bool
   answer_options: list[str]
 
   @classmethod
-  def in_progress(cls) -> 'SentMessage':
+  def in_progress(cls) -> 'SeningMessage':
     """読み込み中のメッセージを作成する"""
     return cls(
       sender=Sender.MODEL,
@@ -65,7 +71,7 @@ class SentMessage(Message):
     )
   
   @classmethod
-  def failed(cls, text=None) -> 'SentMessage':
+  def failed(cls, text=None) -> 'SeningMessage':
     """読み込み失敗のメッセージを作成する"""
     return cls(
       sender=Sender.MODEL,
@@ -77,7 +83,7 @@ class SentMessage(Message):
     )
   
   @classmethod
-  def completed(cls, text: str, is_repliy_allowed = True, answer_options: list[str] = []) -> 'SentMessage':
+  def completed(cls, text: str, is_repliy_allowed = True, answer_options: list[str] = []) -> 'SeningMessage':
     """完了のメッセージを作成する"""
     return cls(
       sender=Sender.MODEL,
@@ -89,8 +95,8 @@ class SentMessage(Message):
     )
 
   @classmethod
-  def from_message(cls, message: Message, is_reply_allowed: bool, answer_options: list[str]) -> 'SentMessage':
-    """MessageインスタンスからSentMessageインスタンスを作成する"""
+  def from_message(cls, message: Message, is_reply_allowed: bool, answer_options: list[str]) -> 'SeningMessage':
+    """MessageインスタンスからSendingMessageインスタンスを作成する"""
     return cls(
       sender=message.sender,
       status=message.status,
