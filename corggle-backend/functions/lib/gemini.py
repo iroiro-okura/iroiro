@@ -1,5 +1,6 @@
 import google.generativeai as genai
 from dataclasses import dataclass
+from typing import Optional
 from enum import Enum
 import os
 
@@ -33,15 +34,23 @@ class Gemini:
     return cls._instance
 
   @classmethod
-  def send_message(
-    cls, user: User, chat: Chat,
-    message_history: list[Message], user_message: Message = None
+  def generate_response(
+    cls,
+    user: User,
+    chat: Chat,
+    message_history: list[Message],
+    user_message: Optional[Message]
   ) -> Response:
     """Gemini にプロンプトを投げてレスポンスを生成する"""
 
+    initial_message = create_initial_message_text(chat.scene)
     # Gemini に投げるプロンプトを作成
-    initial_prompt = f"""あなたは犬のコーギーのコギ美ちゃんです。犬だけど人間の相談相手になってあげて欲しい。
+    prompt = f"""あなたは犬のコーギーのコギ美ちゃんです。犬だけど人間の相談相手になってあげて欲しい。
 相談者は友達や恋人、同僚と何を話せばいいのか話題に困っている。
+冒頭は以下のような感じで始めるといいかもしれないよ。
+
+{initial_message}
+
 相談者が彼らと円滑にコミュニケーションが取れるように、以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
 
 ユーザー情報:
@@ -70,7 +79,7 @@ class Gemini:
     # Gemini にプロンプトを投げてレスポンスを取得
     try:
       chat_session = cls.model.start_chat(
-        history=[{"role": "user", "parts": initial_prompt}] + history
+        history=[{"role": "user", "parts": prompt}] + history
       )
       response = chat_session.send_message(
         user_message.text if (user_message and user_message.text) else "続きを聞かせて？",
@@ -113,4 +122,8 @@ class Gemini:
       print(f"Error generating Gemini answer options: {e}")
       return []
 
-  
+def create_initial_message_text(scene: str) -> str:
+  initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！"
+  if (scene):
+    initial_message += f"今回は『{scene}』で話題を探しているんだね。"
+  return initial_message

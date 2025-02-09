@@ -46,7 +46,7 @@ class Firestore:
       'status': message.status.value,
       'text': message.text,
       'sentAt': firestore.firestore.SERVER_TIMESTAMP,
-      'isReplyAllowed': message.is_reply_allowed,
+      'isReplyAllowed': message.reply_allowed,
       'answerOptions': message.answer_options
     })
     message_id = message_ref[1].id
@@ -60,7 +60,7 @@ class Firestore:
     message_ref.update({
       'status': message.status.value,
       'text': message.text,
-      'isReplyAllowed': message.is_reply_allowed,
+      'isReplyAllowed': message.reply_allowed,
       'answerOptions': message.answer_options
     })
     print(f"Message updated in Firestore. chat_id: {chat_id} messsage_id: {message_id} message: {message}")

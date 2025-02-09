@@ -55,7 +55,7 @@ class SentMessage(Message):
 
 @dataclasses.dataclass
 class SeningMessage(Message):
-  is_reply_allowed: bool
+  reply_allowed: bool
   answer_options: list[str]
 
   @classmethod
@@ -66,7 +66,7 @@ class SeningMessage(Message):
       status=Status.IN_PROGRESS,
       text="...(ちょっとまっててコギ)",
       sent_at=datetime.datetime.now(),
-      is_reply_allowed=False,
+      reply_allowed=False,
       answer_options=[]
     )
   
@@ -78,30 +78,30 @@ class SeningMessage(Message):
       status=Status.FAILED,
       text=text if text else "読み込みに失敗しちゃったみたい...もう一度試してみてね！",
       sent_at=datetime.datetime.now(),
-      is_reply_allowed=True,
+      reply_allowed=True,
       answer_options=[]
     )
   
   @classmethod
-  def completed(cls, text: str, is_repliy_allowed = True, answer_options: list[str] = []) -> 'SeningMessage':
+  def completed(cls, text: str, sender = Sender.MODEL, reply_allowed = True, answer_options: list[str] = []) -> 'SeningMessage':
     """完了のメッセージを作成する"""
     return cls(
-      sender=Sender.MODEL,
+      sender=sender,
       status=Status.COMPLETED,
       text=text,
       sent_at=datetime.datetime.now(),
-      is_reply_allowed=is_repliy_allowed,
+      reply_allowed=reply_allowed,
       answer_options=answer_options
     )
 
   @classmethod
-  def from_message(cls, message: Message, is_reply_allowed: bool, answer_options: list[str]) -> 'SeningMessage':
+  def from_message(cls, message: Message, reply_allowed: bool, answer_options: list[str]) -> 'SeningMessage':
     """MessageインスタンスからSendingMessageインスタンスを作成する"""
     return cls(
       sender=message.sender,
       status=message.status,
       text=message.text,
       sent_at=message.sent_at,
-      is_reply_allowed=is_reply_allowed,
+      reply_allowed=reply_allowed,
       answer_options=answer_options
     )

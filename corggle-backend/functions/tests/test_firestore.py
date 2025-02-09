@@ -43,7 +43,7 @@ class TestFirestoreFunctions(unittest.TestCase):
       status=Status.COMPLETED,
       text="Test message",
       sent_at=None,
-      is_reply_allowed=True,
+      reply_allowed=True,
       answer_options=[]
     )
     add_message('test_chat_id', message)
@@ -56,7 +56,7 @@ class TestFirestoreFunctions(unittest.TestCase):
       status=Status.COMPLETED,
       text="Updated message",
       sent_at=None,
-      is_reply_allowed=True,
+      reply_allowed=True,
       answer_options=[]
     )
     update_message('test_chat_id', 'test_message_id', message)

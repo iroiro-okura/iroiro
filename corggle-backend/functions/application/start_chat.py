@@ -1,4 +1,4 @@
-from model import Chat, SeningMessage
+from model import Chat, SeningMessage, Sender
 from lib import Firestore, Gemini, ResponseStatus
 
 def start_chat(chat_id: str, chat: Chat):
@@ -8,37 +8,24 @@ def start_chat(chat_id: str, chat: Chat):
     failedMessage = SeningMessage.failed("あなたはだれコギ？データベースに登録されていないみたいだね。")
     Firestore.add_message(chat_id, failedMessage)
     raise ValueError(f"User not found: {chat.uid}")
-  initial_message = SeningMessage.completed(
-    create_initial_message_text(chat.scene),
-    is_repliy_allowed=False
-  )
   print(f"Sending initial message")
-  Firestore.add_message(chat_id, initial_message)
   print(f"Sending in-progress message")
   reply_message_id = Firestore.add_message(chat_id, SeningMessage.in_progress())
-  history = [initial_message]
   print(f"Generating gemini response")
-  response = Gemini.send_message(user, chat, history, None)
+  response = Gemini.generate_response(user, chat, [], None)
   if (response.status == ResponseStatus.ERROR):
     message = SeningMessage.failed("コギ美がエラーに遭遇したみたいだね。")
     Firestore.update_message(chat_id, reply_message_id, message)
   elif (response.status == ResponseStatus.SUCCESS):
-    message = SeningMessage.completed(response.text, is_repliy_allowed=True)
+    message = SeningMessage.completed(response.text, reply_allowed=True)
     Firestore.update_message(chat_id, reply_message_id, message)
   else:
     raise ValueError(f"Invalid response status: {response.status}")
   print(f"Generating answer options")
   answer_options = Gemini.suggest_answer_options(response.chat_session)
   if (answer_options):
-    message = SeningMessage.from_message(message, is_reply_allowed=True, answer_options=answer_options)
+    message = SeningMessage.from_message(message, reply_allowed=True, answer_options=answer_options)
     Firestore.update_message(chat_id, reply_message_id, message)
   print(f"Completed: starting chat {chat_id}")
-
-def create_initial_message_text(scene: str) -> str:
-  initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n"
-  if (scene):
-    initial_message += f"今回は『{scene}』で話題を探しているんだね。\n"
-  initial_message += "みんなのプロフィールや興味ありそうなことをもう少し教えてほしいな！"
-  return initial_message
 
 __all__ = ['start_chat']
