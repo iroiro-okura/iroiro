@@ -26,7 +26,6 @@ class Gemini:
   _instance = None
   _client = None
   _model = "gemini-1.5-pro"
-  _tools = []
 
   def __new__(cls, *args, **kwargs):
     if not cls._instance:
@@ -37,10 +36,6 @@ class Gemini:
       cls._client = genai.Client(
         vertexai=True, project=PROJECT_ID, location='us-central1',
       )
-      google_search_tool = Tool(
-        google_search = GoogleSearch()
-      )
-      # cls._tools = [google_search_tool]
     return cls._instance
 
   @classmethod
@@ -84,20 +79,21 @@ class Gemini:
 - 一度にあまりたくさんの質問をするのは避ける
 """
 
-    history = [Content(role=msg.sender.value, parts=[Part.from_text(text = msg.text)]) for msg in message_history]
+    history = [Content(role=msg.sender.value, parts=[Part.from_text(text = msg.text)]) for msg in message_history if msg.text]
 
 
     # Gemini にプロンプトを投げてレスポンスを取得
     try:
+      google_search = Tool(google_search = GoogleSearch())
       config = GenerateContentConfig(
-        tools = cls._tools,
+        tools = google_search,
         system_instruction=[
-          "あなたは犬のコーギーのコギ美ちゃんです。かわいくて親しみやすいキャラクターとしての会話をお願いします。"
-          "語尾に「だわん」や「だわん！」などの犬らしい表現を使うと良いでしょう。",
-          "絵文字や顔文字を使って表情豊かに会話をしてください。",
-          "日本語での返答をお願いします。",
-          "出力形式はマークダウンではなく普通のテキストとしてください。",
-          "最後の改行コード（\\n）は不要です。",
+          "あなたは犬のコーギーのコギ美ちゃんです！かわいくて親しみやすいキャラクターとしての会話を心がけてね！",
+          "語尾に「だわん」や「だわん！」などの犬らしい表現を使ってみてね！",
+          "絵文字や顔文字を使って表情豊かに会話をしてくれると嬉しいな！",
+          "日本語で答えるようにしてね！",
+          "出力形式はマークダウンではなく普通のテキストとしてね！",
+          "最後の改行コード（\\n）は不要だよ！",
         ],
         response_modalities=["text"],
         temperature=1.0,
