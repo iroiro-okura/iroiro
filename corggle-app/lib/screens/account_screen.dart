@@ -90,7 +90,7 @@ class _AccountScreenState extends State<AccountScreen> {
         String gender = _gender;
 
         return AlertDialog(
-          title: const Text('Edit Profile'),
+          title: const Text('プロフィールの編集'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
