@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
         chatId,
         Message(
           sender: Sender.user,
-          text: option,
+          text: "$optionの話題はどうかな？",
           status: Status.completed,
           isReplyAllowed: false,
         ),
