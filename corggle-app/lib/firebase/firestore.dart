@@ -61,6 +61,14 @@ class FirestoreService {
       updatedFields['occupation'] = user.occupation;
     }
 
+    if (user.hometown != existingUser.hometown) {
+      updatedFields['hometown'] = user.hometown;
+    }
+
+    if (user.hobbies != existingUser.hobbies) {
+      updatedFields['hobbies'] = user.hobbies;
+    }
+
     // Update the Firestore document with the changed fields
     logger.i('Setting user $user');
     if (updatedFields.isNotEmpty) {

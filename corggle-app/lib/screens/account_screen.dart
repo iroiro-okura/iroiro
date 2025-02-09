@@ -20,6 +20,8 @@ class _AccountScreenState extends State<AccountScreen> {
   String _gender = '';
   int _age = 0;
   String _occupation = '';
+  List<String> _hobbies = [];
+  String _hometown = '';
   bool _isLoading = false;
 
   @override
@@ -32,6 +34,8 @@ class _AccountScreenState extends State<AccountScreen> {
         _gender = user.gender?.toString().split('.').last ?? '';
         _age = user.age ?? 0;
         _occupation = user.occupation ?? '';
+        _hobbies = user.hobbies ?? [];
+        _hometown = user.hometown ?? '';
       });
     }
   }
@@ -64,6 +68,8 @@ class _AccountScreenState extends State<AccountScreen> {
             : null,
         age: age,
         occupation: occupation,
+        hometown: _hometown,
+        hobbies: _hobbies,
       );
       await FirestoreService.updateUser(updatedUser);
     }
@@ -75,11 +81,12 @@ class _AccountScreenState extends State<AccountScreen> {
       builder: (BuildContext context) {
         final TextEditingController usernameController =
             TextEditingController(text: _username);
-
         final TextEditingController ageController =
             TextEditingController(text: _age == 0 ? '' : _age.toString());
         final TextEditingController occupationController =
             TextEditingController(text: _occupation);
+        final TextEditingController hometownController =
+            TextEditingController(text: _hometown);
         String gender = _gender;
 
         return AlertDialog(
@@ -98,6 +105,14 @@ class _AccountScreenState extends State<AccountScreen> {
                 _buildDropdownButtonFormField(gender),
                 _buildTextField(ageController, '年齢', TextInputType.number),
                 _buildTextField(occupationController, '職業'),
+                _buildTextField(hometownController, '出身地'),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: _editHobbies,
+                  child: Text("趣味を編集",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary)),
+                ),
               ],
             ),
           ),
@@ -124,6 +139,119 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _editHobbies() {
+    List<String> allHobbies = [
+      "スポーツ",
+      "音楽",
+      "読書",
+      "映画",
+      "旅行",
+      "ゲーム",
+      "料理",
+      "アート",
+      "カメラ",
+      "ダンス"
+    ];
+
+    for (String hobby in _hobbies) {
+      if (!allHobbies.contains(hobby)) {
+        allHobbies.add(hobby);
+      }
+    }
+
+    List<String> selectedHobbies = List.from(_hobbies);
+    TextEditingController customHobbyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('趣味を編集'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // **選択可能な趣味**
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: allHobbies.map((hobby) {
+                        return ChoiceChip(
+                          label: Text(hobby),
+                          selected: selectedHobbies.contains(hobby),
+                          selectedColor: Colors.blueAccent.withAlpha(70),
+                          onSelected: (bool selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedHobbies.add(hobby);
+                              } else {
+                                selectedHobbies.remove(hobby);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+
+                    const Divider(),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: customHobbyController,
+                            decoration: const InputDecoration(
+                              labelText: "新しい趣味を追加",
+                              hintText: "例: ガーデニング",
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            if (customHobbyController.text.isNotEmpty &&
+                                !selectedHobbies
+                                    .contains(customHobbyController.text)) {
+                              setState(() {
+                                allHobbies.add(customHobbyController.text);
+                                selectedHobbies.add(customHobbyController.text);
+                                customHobbyController.clear();
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('キャンセル'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: const Text('保存'),
+                  onPressed: () async {
+                    setState(() {
+                      _hobbies = selectedHobbies;
+                    });
+
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -171,7 +299,7 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildProfileCard(IconData icon, String title, String content) {
+  Widget _buildProfileCard(IconData icon, String title, Widget content) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
@@ -180,8 +308,47 @@ class _AccountScreenState extends State<AccountScreen> {
           icon,
           color: Theme.of(context).colorScheme.primary,
         ),
-        title: Text('$title: $content'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$title:'),
+            const SizedBox(height: 4),
+            content,
+          ],
+        ),
       ),
+    );
+  }
+
+  final Map<String, IconData> _hobbyIcons = {
+    "スポーツ": Icons.sports_soccer,
+    "音楽": Icons.music_note,
+    "読書": Icons.book,
+    "映画": Icons.movie,
+    "旅行": Icons.flight,
+    "ゲーム": Icons.videogame_asset,
+    "料理": Icons.restaurant,
+    "アート": Icons.palette,
+    "カメラ": Icons.camera_alt,
+    "ダンス": Icons.directions_run,
+  };
+
+  Widget _buildHobbyChips() {
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 4.0,
+      alignment: WrapAlignment.center,
+      children: _hobbies.map((hobby) {
+        return Chip(
+          label: Text(hobby, style: const TextStyle(fontSize: 10)),
+          avatar: Icon(
+            _hobbyIcons[hobby] ?? Icons.star,
+            size: 18,
+            color: Colors.white,
+          ),
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+        );
+      }).toList(),
     );
   }
 
@@ -213,18 +380,24 @@ class _AccountScreenState extends State<AccountScreen> {
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
+              if (_hobbies.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                _buildHobbyChips(),
+              ],
               if (_gender.isNotEmpty)
                 _buildProfileCard(
-                    Icons.person, '性別', _getGenderDisplayName(_gender)),
-              if (_age != 0) _buildProfileCard(Icons.cake, '年齢', '$_age'),
+                    Icons.person, '性別', Text(_getGenderDisplayName(_gender))),
+              if (_age != 0) _buildProfileCard(Icons.cake, '年齢', Text('$_age')),
               if (_occupation.isNotEmpty)
-                _buildProfileCard(Icons.work, '職業', _occupation),
+                _buildProfileCard(Icons.work, '職業', Text(_occupation)),
+              if (_hometown.isNotEmpty)
+                _buildProfileCard(Icons.home, '出身地', Text(_hometown)),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _editProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.secondary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(

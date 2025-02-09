@@ -6,6 +6,8 @@ class User {
     this.age,
     this.gender,
     this.occupation,
+    this.hometown,
+    this.hobbies,
   });
 
   final String uid;
@@ -14,6 +16,8 @@ class User {
   final int? age;
   final Gender? gender;
   final String? occupation;
+  final String? hometown;
+  final List<String>? hobbies;
 
   factory User.fromJson(String uid, Map<String, dynamic> data) {
     return User(
@@ -26,6 +30,10 @@ class User {
               .firstWhere((e) => e.toString() == 'Gender.${data['gender']}')
           : null,
       occupation: data['occupation'] as String?,
+      hometown: data['hometown'] as String?,
+      hobbies: data['hobbies'] != null
+          ? List<String>.from(data['hobbies'] as List)
+          : null,
     );
   }
 }
