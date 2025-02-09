@@ -7,6 +7,7 @@ import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/model/chat.dart';
 import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
+import 'package:iroiro/screens/error_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 
@@ -22,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
 
   ChatProvider? _chatProvider;
+  String? _failedMessage;
 
   @override
   void initState() {
@@ -84,6 +86,36 @@ class _ChatScreenState extends State<ChatScreen> {
           isReplyAllowed: false,
         ),
       );
+    }
+  }
+
+  void _retrySendMessage() async {
+    if (_failedMessage != null) {
+      final targetChat = _chatProvider?.chat;
+      if (targetChat?.chatId != null) {
+        try {
+          await FirestoreService.sendMessage(
+            targetChat!.chatId,
+            Message(
+                sender: Sender.user,
+                text: _failedMessage!,
+                status: Status.completed,
+                isReplyAllowed: false),
+          );
+          setState(() {
+            _failedMessage = null;
+          });
+        } catch (e) {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ErrorScreen(errorMessage: "チャット中のエラー"),
+              ),
+            );
+          }
+        }
+      }
     }
   }
 
@@ -194,6 +226,11 @@ class _ChatScreenState extends State<ChatScreen> {
                             final isUser = message.sender == Sender.user;
                             final status = message.status;
 
+                            if (message.status == Status.failed) {
+                              _failedMessage =
+                                  messages[messages.length - 2].text;
+                            }
+
                             return Column(
                               crossAxisAlignment: isUser
                                   ? CrossAxisAlignment.end
@@ -233,11 +270,29 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? const AnimatedDots()
                                           : message.status == Status.completed
                                               ? SelectableText(message.text)
-                                              : Text(
-                                                  "エラーが発生しました",
-                                                  style: TextStyle(
-                                                      color: theme
-                                                          .colorScheme.error),
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "エラーが発生しました",
+                                                      style: TextStyle(
+                                                          color: theme
+                                                              .colorScheme
+                                                              .error),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed:
+                                                          _retrySendMessage,
+                                                      child: Text(
+                                                        "リトライ",
+                                                        style: TextStyle(
+                                                            color: theme
+                                                                .colorScheme
+                                                                .primary),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                     ),
                                   ),

@@ -7,6 +7,7 @@ import 'package:iroiro/providers/chat_provider.dart';
 import 'package:iroiro/providers/user_provider.dart';
 import 'package:iroiro/screens/account_screen.dart';
 import 'package:iroiro/screens/chat_screen.dart';
+import 'package:iroiro/screens/error_screen.dart';
 import 'package:iroiro/screens/history_screen.dart';
 import 'package:iroiro/screens/home_screen.dart';
 import 'package:iroiro/screens/welcome_screen.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
             '/history': (context) =>
                 HistoryScreen(controller: PersistentTabController()),
             '/account': (context) => const AccountScreen(),
+            '/error':  (context) => const ErrorScreen(),
           },
           theme: ThemeData(
             fontFamily: 'Murecho',
