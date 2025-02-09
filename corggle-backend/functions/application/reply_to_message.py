@@ -1,4 +1,4 @@
-from model import Message, SeningMessage
+from model import Message, SeningMessage, Sender
 from lib import Firestore, Gemini, ResponseStatus
 
 def reply_to_message(chat_id: str, message_id: str, message: Message):
@@ -40,7 +40,7 @@ def reply_to_message(chat_id: str, message_id: str, message: Message):
     message = SeningMessage.from_message(message, reply_allowed=True, answer_options=answer_options)
     Firestore.update_message(chat_id, reply_message_id, message)
 
-  user_messages = [msg for msg in messages if msg.sender == 'user']
+  user_messages = [msg for msg in messages if msg.sender == Sender.USER]
   if len(user_messages) >= 3 and not chat.title:
     print(f"Give a title to chat")
     title = Gemini.give_title_to_chat(chat_session)
