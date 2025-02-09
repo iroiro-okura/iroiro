@@ -17,6 +17,22 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  List<Chat> _chats = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChats();
+  }
+
+  Future<void> _loadChats() async {
+    final uid = Provider.of<UserProvider>(context, listen: false).user!.uid;
+    final chats = await FirestoreService.getAllChats(uid);
+    setState(() {
+      _chats = chats;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final uid = Provider.of<UserProvider>(context, listen: false).user!.uid;
@@ -37,8 +53,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               return const Center(child: Text('チャット履歴はありません。'));
             }
 
-            final chats = snapshot.data;
-            if (chats == null || chats.isEmpty) {
+            final chats = snapshot.data ?? _chats;
+            if (chats.isEmpty) {
               return const Center(child: Text('チャット履歴はありません。'));
             }
 
@@ -56,9 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
                 Expanded(
                     child: RefreshIndicator(
-                  onRefresh: () async {
-                    await FirestoreService.getAllChats(uid);
-                  },
+                  onRefresh: _loadChats,
                   child: ListView.builder(
                     itemCount: chats.length,
                     itemBuilder: (context, index) {
