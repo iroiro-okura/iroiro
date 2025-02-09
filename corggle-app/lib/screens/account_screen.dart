@@ -186,7 +186,10 @@ class _AccountScreenState extends State<AccountScreen> {
                         return ChoiceChip(
                           label: Text(hobby),
                           selected: selectedHobbies.contains(hobby),
-                          selectedColor: Colors.blueAccent.withAlpha(70),
+                          selectedColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withAlpha(70),
                           onSelected: (bool selected) {
                             setState(() {
                               if (selected) {
@@ -345,7 +348,7 @@ class _AccountScreenState extends State<AccountScreen> {
           avatar: Icon(
             _hobbyIcons[hobby] ?? Icons.star,
             size: 18,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.secondary,
           ),
           backgroundColor: Theme.of(context).colorScheme.tertiary,
         );
