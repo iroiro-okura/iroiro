@@ -353,7 +353,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       if (messages.last.answerOptions != null)
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -371,7 +371,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               const SizedBox(height: 8),
                               Wrap(
                                 spacing: 4.0,
-                                runSpacing: 4.0,
+                                runSpacing: 2.0,
                                 alignment: WrapAlignment.start,
                                 children:
                                     messages.last.answerOptions!.map((option) {
@@ -386,10 +386,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                             theme.colorScheme.onSecondary,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                              BorderRadius.circular(15),
                                         ),
                                         padding: const EdgeInsets.symmetric(
-                                            vertical: 4, horizontal: 8),
+                                            vertical: 2, horizontal: 8
+                                        ),
                                       ),
                                       child: Text(
                                         option,
