@@ -1,10 +1,13 @@
-import google.generativeai as genai
 from dataclasses import dataclass
 from typing import Optional
 from enum import Enum
 import os
 
 from model import User, Chat, Message
+
+from google import genai
+from google.genai.chats import Chat as ChatSession
+from google.genai.types import Tool, GenerateContentConfig, GoogleSearch, Content, Part
 
 def initialize_gemini():
   return Gemini()
@@ -17,20 +20,27 @@ class ResponseStatus(Enum):
 class Response:
   text: str
   status: ResponseStatus
-  chat_session: genai.ChatSession
+  chat_session: ChatSession
 
 class Gemini:
   _instance = None
+  _client = None
+  _model = "gemini-2.0-flash-001"
+  _tools = []
 
   def __new__(cls, *args, **kwargs):
     if not cls._instance:
       cls._instance = super(Gemini, cls).__new__(cls, *args, **kwargs)
-      # Gemini API キーの取得
-      GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-      if (not GEMINI_API_KEY):
-        raise ValueError("Gemini API key not found.")
-      genai.configure(api_key=GEMINI_API_KEY)
-      cls.model = genai.GenerativeModel("models/gemini-2.0-pro-exp")
+      PROJECT_ID = os.getenv('PROJECT_ID')
+      if (not PROJECT_ID):
+        raise ValueError("project idnot found.")
+      cls._client = genai.Client(
+          vertexai=True, project=PROJECT_ID, location='us-central1'
+      )
+      google_search_tool = Tool(
+        google_search = GoogleSearch()
+      )
+      _tools = [google_search_tool]
     return cls._instance
 
   @classmethod
@@ -76,12 +86,19 @@ class Gemini:
 - 一度にあまりたくさんの質問をするのは避ける
 """
 
-    history = [{"role": msg.sender.value, "parts": msg.text} for msg in message_history]
+    history = [Content(role=msg.sender.value, parts=[Part.from_text(text = msg.text)]) for msg in message_history]
+
 
     # Gemini にプロンプトを投げてレスポンスを取得
     try:
-      chat_session = cls.model.start_chat(
-        history=[{"role": "user", "parts": prompt}] + history
+      config = GenerateContentConfig(
+        tools = cls._tools,
+        response_modalities=["text"],
+      )
+      chat_session = cls._client.chats.create(
+        model=cls._model,
+        config=config,
+        history=[Content(role="user", parts=[Part.from_text(text = prompt)])] + history
       )
       response = chat_session.send_message(
         user_message.text if (user_message and user_message.text) else "続きを聞かせて？",
@@ -93,13 +110,14 @@ class Gemini:
       return Response(text=None, status=ResponseStatus.ERROR, chat_session=None)
 
   @classmethod
-  def suggest_answer_options(cls, chat_session: genai.ChatSession) -> list[str]:
+  def suggest_answer_options(cls, chat_session: ChatSession) -> list[str]:
     if (not chat_session):
       print("Chat session is not provided.")
       return []
     """Gemini に質問を投げて回答候補を生成する"""
     prompt = """
-ここまでの会話を踏まえて、次の質問に対する回答候補を提案してください。
+ここまでの会話を踏まえて、次のユーザーの回答候補を提案してください。
+対話の流れがおかしくならないような答えが望ましいです。
 
 * 回答候補は以下の制約に従ってください。
     * 回答候補の数は必ず4個以内とする。
@@ -117,10 +135,7 @@ class Gemini:
 上記制約や回答例に沿って回答候補を生成してください。
 """
     try:
-      config = genai.types.GenerationConfig(
-        temperature=0, top_p=1, top_k=32,
-      )
-      response = chat_session.send_message(prompt, generation_config=config)
+      response = chat_session.send_message(prompt)
       answers = [s.strip() for s in response.text.split("\n") if s.strip()]
       return answers[:4]
     except Exception as e:
@@ -128,7 +143,7 @@ class Gemini:
       return []
 
   @classmethod
-  def give_title_to_chat(cls, chat_session: genai.ChatSession) -> Optional[str]:
+  def give_title_to_chat(cls, chat_session: ChatSession) -> Optional[str]:
     """Gemini にタイトルを付けてもらう"""
     if (not chat_session):
       print("Chat session is not provided.")

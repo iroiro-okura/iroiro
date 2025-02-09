@@ -11,9 +11,9 @@ from application import start_chat, reply_to_message
 from model import SentMessage, Sender, Status, Chat
 
 # Cloud Functions のトリガー設定
-from firebase_functions import firestore_fn
+from firebase_functions import firestore_fn, options
 
-@firestore_fn.on_document_created(document="chats/{chatId}", region="asia-northeast1", timeout_sec=300)
+@firestore_fn.on_document_created(document="chats/{chatId}", region="asia-northeast1", timeout_sec=300, memory=options.MemoryOption.GB_2)
 def onchatcreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
   """Firestore のチャットが作成されたときに実行される関数"""
   print(f"onchatcreated: {event}")
@@ -24,7 +24,7 @@ def onchatcreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None
   
   print(f"onchatcreated: id: {chat_id}, data: {chat}")
 
-@firestore_fn.on_document_created(document="chats/{chatId}/messages/{messageId}", region="asia-northeast1", timeout_sec=300)
+@firestore_fn.on_document_created(document="chats/{chatId}/messages/{messageId}", region="asia-northeast1", timeout_sec=300, memory=options.MemoryOption.GB_4)
 def onmessagecreated(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
   """Firestore のチャットメッセージが作成されたときに実行される関数"""
   print(f"onchatmessagecreated: {event}")

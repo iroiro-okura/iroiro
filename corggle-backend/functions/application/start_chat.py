@@ -1,4 +1,4 @@
-from model import Chat, SeningMessage, Sender
+from model import Chat, SeningMessage
 from lib import Firestore, Gemini, ResponseStatus
 
 def start_chat(chat_id: str, chat: Chat):

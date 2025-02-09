@@ -41,7 +41,7 @@ def reply_to_message(chat_id: str, message_id: str, message: Message):
     Firestore.update_message(chat_id, reply_message_id, message)
 
   user_messages = [msg for msg in messages if msg.sender == Sender.USER]
-  if len(user_messages) >= 3 and not chat.title:
+  if len(user_messages) >= 3 and len(user_messages) % 3 == 0:
     print(f"Give a title to chat")
     title = Gemini.give_title_to_chat(chat_session)
     if title:
