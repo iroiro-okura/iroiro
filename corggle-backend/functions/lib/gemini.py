@@ -25,7 +25,7 @@ class Response:
 class Gemini:
   _instance = None
   _client = None
-  _model = "gemini-2.0-flash-001"
+  _model = "gemini-1.5-pro"
   _tools = []
 
   def __new__(cls, *args, **kwargs):
@@ -33,14 +33,14 @@ class Gemini:
       cls._instance = super(Gemini, cls).__new__(cls, *args, **kwargs)
       PROJECT_ID = os.getenv('PROJECT_ID')
       if (not PROJECT_ID):
-        raise ValueError("project idnot found.")
+        raise ValueError("project id not found.")
       cls._client = genai.Client(
-          vertexai=True, project=PROJECT_ID, location='us-central1'
+        vertexai=True, project=PROJECT_ID, location='us-central1',
       )
       google_search_tool = Tool(
         google_search = GoogleSearch()
       )
-      _tools = [google_search_tool]
+      # cls._tools = [google_search_tool]
     return cls._instance
 
   @classmethod
@@ -78,8 +78,6 @@ class Gemini:
 開始時間: {chat.created_at}
 
 注意事項:
-- 日本語での返答をする
-- 出力形式はマークダウンではなく普通のテキストとして表示される
 - 会話はフレンドリーで親しみやすく
 - 会話は簡潔でわかりやすく
 - 短めの応答で会話続けるように心がける
@@ -93,7 +91,18 @@ class Gemini:
     try:
       config = GenerateContentConfig(
         tools = cls._tools,
+        system_instruction=[
+          "あなたは犬のコーギーのコギ美ちゃんです。かわいくて親しみやすいキャラクターとしての会話をお願いします。"
+          "語尾に「だわん」や「だわん！」などの犬らしい表現を使うと良いでしょう。",
+          "絵文字や顔文字を使って表情豊かに会話をしてください。",
+          "日本語での返答をお願いします。",
+          "出力形式はマークダウンではなく普通のテキストとしてください。",
+          "最後の改行コード（\\n）は不要です。",
+        ],
         response_modalities=["text"],
+        temperature=1.0,
+        top_p=0.95,
+        top_k=32,
       )
       chat_session = cls._client.chats.create(
         model=cls._model,
@@ -104,7 +113,7 @@ class Gemini:
         user_message.text if (user_message and user_message.text) else "続きを聞かせて？",
       )
       print(f"Successfully generated Gemini response!! response: {response.text}")
-      return Response(text=response.text, status=ResponseStatus.SUCCESS, chat_session=chat_session)
+      return Response(text=response.text.strip(), status=ResponseStatus.SUCCESS, chat_session=chat_session)
     except Exception as e:
       print(f"Error generating Gemini response: {e}")
       return Response(text=None, status=ResponseStatus.ERROR, chat_session=None)
