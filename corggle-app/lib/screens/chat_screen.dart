@@ -175,101 +175,106 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   _scrollToBottom();
 
-                  return ListView.builder(
-                    itemCount: messages.length,
-                    cacheExtent: 1000,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: _scrollController,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      final isUser = message.sender == Sender.user;
-                      final status = message.status;
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: messages.length,
+                          cacheExtent: 1000,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          controller: _scrollController,
+                          itemBuilder: (context, index) {
+                            final message = messages[index];
+                            final isUser = message.sender == Sender.user;
+                            final status = message.status;
 
-                      return Column(
-                          crossAxisAlignment: isUser
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: isUser
-                                  ? Alignment.topRight
-                                  : Alignment.topLeft,
-                              child: ListTile(
-                                titleAlignment: ListTileTitleAlignment.top,
-                                leading: isUser
-                                    ? null
-                                    : _buildAvatar(name, false, status),
-                                trailing: isUser
-                                    ? _buildAvatar(name, true, null)
-                                    : null,
-                                title: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: isUser
-                                        ? theme.colorScheme.primary
-                                            .withAlpha(50)
-                                        : theme.colorScheme.tertiary,
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(10),
-                                      bottomRight: Radius.circular(10),
-                                      topLeft: isUser
-                                          ? Radius.circular(10)
-                                          : Radius.circular(0),
-                                      topRight: isUser
-                                          ? Radius.circular(0)
-                                          : Radius.circular(10),
-                                    ),
-                                  ),
-                                  child: message.status == Status.inProgress
-                                      ? const AnimatedDots()
-                                      : message.status == Status.completed
-                                          ? Text(message.text)
-                                          : Text(
-                                              "エラーが発生しました",
-                                              style: TextStyle(
-                                                  color:
-                                                      theme.colorScheme.error),
-                                            ),
-                                ),
-                              ),
-                            ),
-                            if (messages.last.answerOptions != null)
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Wrap(
-                                  spacing: 8.0,
-                                  runSpacing: 8.0,
-                                  alignment: WrapAlignment.center,
-                                  children: messages.last.answerOptions!
-                                      .map((option) {
-                                    return SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.45,
-                                      child: ElevatedButton(
-                                        onPressed: () =>
-                                            _sendMessageFromOption(option),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              theme.colorScheme.secondary,
-                                          foregroundColor:
-                                              theme.colorScheme.onSecondary,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          option,
-                                          softWrap: true,
-                                          textAlign: TextAlign.center,
+                            return Column(
+                              crossAxisAlignment: isUser
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Align(
+                                  alignment: isUser
+                                      ? Alignment.topRight
+                                      : Alignment.topLeft,
+                                  child: ListTile(
+                                    titleAlignment: ListTileTitleAlignment.top,
+                                    leading: isUser
+                                        ? null
+                                        : _buildAvatar(name, false, status),
+                                    trailing: isUser
+                                        ? _buildAvatar(name, true, null)
+                                        : null,
+                                    title: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: isUser
+                                            ? theme.colorScheme.primary
+                                                .withAlpha(50)
+                                            : theme.colorScheme.tertiary,
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(10),
+                                          bottomRight: Radius.circular(10),
+                                          topLeft: isUser
+                                              ? Radius.circular(10)
+                                              : Radius.circular(0),
+                                          topRight: isUser
+                                              ? Radius.circular(0)
+                                              : Radius.circular(10),
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
+                                      child: message.status == Status.inProgress
+                                          ? const AnimatedDots()
+                                          : message.status == Status.completed
+                                              ? Text(message.text)
+                                              : Text(
+                                                  "エラーが発生しました",
+                                                  style: TextStyle(
+                                                      color: theme
+                                                          .colorScheme.error),
+                                                ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                          ]);
-                    },
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      if (messages.last.answerOptions != null)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Wrap(
+                            spacing: 8.0,
+                            runSpacing: 8.0,
+                            alignment: WrapAlignment.center,
+                            children:
+                                messages.last.answerOptions!.map((option) {
+                              return SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: ElevatedButton(
+                                  onPressed: () =>
+                                      _sendMessageFromOption(option),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        theme.colorScheme.secondary,
+                                    foregroundColor:
+                                        theme.colorScheme.onSecondary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    option,
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                    ],
                   );
                 },
               ),
