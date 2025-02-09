@@ -166,14 +166,17 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('新しいチャットを開始'),
+          title: const Text(
+            '新しいチャットを開始',
+            style: TextStyle(fontSize: 18),
+          ),
           content: const Text('シーンを選択してください。'),
           actions: [
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await chatProvider.createNewChat(uid, "フリートーク");
-                chatProvider.setScene("フリートーク");
+                await chatProvider.createNewChat(uid, "");
+                chatProvider.setScene("");
               },
               child: const Text('フリートーク'),
             ),
@@ -274,7 +277,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               if (userMessages.isNotEmpty) {
                                 _failedMessage = userMessages.last.text;
                               } else {
-                                _failedMessage = message.text;
+                                _failedMessage = "";
                               }
                             }
                             return Column(
