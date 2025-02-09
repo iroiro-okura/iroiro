@@ -50,7 +50,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ));
             }
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('チャット履歴はありません。'));
+              return Center(
+                  child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.secondary,
+              ));
             }
 
             final chats = snapshot.data ?? _chats;

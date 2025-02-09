@@ -268,10 +268,15 @@ class _ChatScreenState extends State<ChatScreen> {
                             final status = message.status;
 
                             if (message.status == Status.failed) {
-                              _failedMessage =
-                                  messages[messages.length - 2].text;
+                              final userMessages = messages
+                                  .where((msg) => msg.sender == Sender.user)
+                                  .toList();
+                              if (userMessages.isNotEmpty) {
+                                _failedMessage = userMessages.last.text;
+                              } else {
+                                _failedMessage = message.text;
+                              }
                             }
-
                             return Column(
                               crossAxisAlignment: isUser
                                   ? CrossAxisAlignment.end
@@ -362,8 +367,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                               const SizedBox(height: 8),
                               Wrap(
-                                spacing: 8.0,
-                                runSpacing: 8.0,
+                                spacing: 4.0,
+                                runSpacing: 4.0,
                                 alignment: WrapAlignment.start,
                                 children:
                                     messages.last.answerOptions!.map((option) {
@@ -380,16 +385,19 @@ class _ChatScreenState extends State<ChatScreen> {
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4, horizontal: 8),
                                       ),
-                                      child: Text(option,
-                                          softWrap: true,
-                                          textAlign: TextAlign.center,
-                                          overflow: TextOverflow.visible,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color:
-                                                theme.colorScheme.onSecondary,
-                                          )),
+                                      child: Text(
+                                        option,
+                                        softWrap: true,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.visible,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: theme.colorScheme.onSecondary,
+                                        ),
+                                      ),
                                     ),
                                   );
                                 }).toList(),
