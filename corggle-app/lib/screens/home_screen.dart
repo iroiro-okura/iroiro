@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            '質問に答えて、\n盛り上がる場面に\n合った話題を見つける',
+                            '質問に答えて、\n場面に合った\n話題を見つけよう！',
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w400),
                           ),
