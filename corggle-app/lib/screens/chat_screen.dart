@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
         chatId,
         Message(
           sender: Sender.user,
-          text: "$optionの話題はどうかな？",
+          text: option,
           status: Status.completed,
           isReplyAllowed: false,
         ),
@@ -256,7 +256,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Text(
                                 messages.last.answerOptions != null &&
                                         messages.last.answerOptions!.isNotEmpty
-                                    ? '話題候補:'
+                                    ? '候補:'
                                     : '',
                                 style: TextStyle(
                                   fontSize: 12,

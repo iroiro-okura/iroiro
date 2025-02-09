@@ -331,6 +331,7 @@ class _AccountScreenState extends State<AccountScreen> {
     "アート": Icons.palette,
     "カメラ": Icons.camera_alt,
     "ダンス": Icons.directions_run,
+    "サウナ": Icons.waves,
   };
 
   Widget _buildHobbyChips() {
