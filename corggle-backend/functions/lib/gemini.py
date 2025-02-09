@@ -7,7 +7,7 @@ from model import User, Chat, Message
 
 from google import genai
 from google.genai.chats import Chat as ChatSession
-from google.genai.types import Tool, GenerateContentConfig, GoogleSearch, Content, Part
+from google.genai.types import Tool, GenerateContentConfig, GoogleSearch, Content, Part, SafetySetting
 
 def initialize_gemini():
   return Gemini()
@@ -25,7 +25,7 @@ class Response:
 class Gemini:
   _instance = None
   _client = None
-  _model = "gemini-1.5-pro"
+  _model = "gemini-2.0-flash-001"
 
   def __new__(cls, *args, **kwargs):
     if not cls._instance:
@@ -58,7 +58,7 @@ class Gemini:
 
 {initial_message}
 
-相談者が彼らと円滑にコミュニケーションが取れるように、以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
+相談者が彼らと円滑にコミュニケーションが取れるように、チャットの履歴に続く形で質問を交えたりときどき時事ネタを交えたりしながら話題を提案してあげてほしいな。
 
 ユーザー情報:
 名前: {user.name if user.name else "わからない"}
@@ -84,9 +84,8 @@ class Gemini:
 
     # Gemini にプロンプトを投げてレスポンスを取得
     try:
-      google_search = Tool(google_search = GoogleSearch())
       config = GenerateContentConfig(
-        tools = google_search,
+        tools = [Tool(google_search = GoogleSearch())],
         system_instruction=[
           "あなたは犬のコーギーのコギ美ちゃんです！かわいくて親しみやすいキャラクターとしての会話を心がけてね！",
           "語尾に「だわん」や「だわん！」などの犬らしい表現を使ってみてね！",
@@ -95,10 +94,22 @@ class Gemini:
           "出力形式はマークダウンではなく普通のテキストとしてね！",
           "最後の改行コード（\\n）は不要だよ！",
         ],
-        response_modalities=["text"],
-        temperature=1.0,
-        top_p=0.95,
-        top_k=32,
+        temperature = 1,
+        top_p = 0.95,
+        response_modalities = ["TEXT"],
+        safety_settings = [SafetySetting(
+          category="HARM_CATEGORY_HATE_SPEECH",
+          threshold="OFF"
+        ),SafetySetting(
+          category="HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold="OFF"
+        ),SafetySetting(
+          category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold="OFF"
+        ),SafetySetting(
+          category="HARM_CATEGORY_HARASSMENT",
+          threshold="OFF"
+        )],
       )
       chat_session = cls._client.chats.create(
         model=cls._model,
@@ -122,10 +133,12 @@ class Gemini:
     """Gemini に質問を投げて回答候補を生成する"""
     prompt = """
 ここまでの会話を踏まえて、次のユーザーの回答候補を提案してください。
-対話の流れがおかしくならないような答えが望ましいです。
+特に最後のコギ美の発言との繋ぎを考慮して対話の流れがおかしくならないような答えを意識してほしいな。
+もし対話の中でユーザーの回答の数が4回以上の間おなじ話題が続いていれば最後に「他の話題を探す」という回答候補を追加するのもいいかもしれない。適宜判断して。
 
 * 回答候補は以下の制約に従ってください。
-    * 回答候補の数は必ず4個以内とする。
+    * 回答候補の数は必ず5個以内とする。
+    * 「他の話題を探す」の回答候補は5個以内に含めない。
     * 各回答候補は最大50文字以内の日本語とする。
     * 回答候補は箇条書き形式ではなく、1行に1つの回答候補のみ記述する。
     * 回答候補の間には必ず改行コード（"\n"）を挿入する。
@@ -142,7 +155,7 @@ class Gemini:
     try:
       response = chat_session.send_message(prompt)
       answers = [s.strip() for s in response.text.split("\n") if s.strip()]
-      return answers[:4]
+      return answers[:10]
     except Exception as e:
       print(f"Error generating Gemini answer options: {e}")
       return []
