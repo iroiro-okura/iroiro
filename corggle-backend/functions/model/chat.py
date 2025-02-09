@@ -17,5 +17,5 @@ class Chat:
     return cls(
       uid=data.get('uid'),
       scene=data.get('scene') if data.get('scene') else '',
-      created_at=datetime.datetime.fromtimestamp(created_at.timestamp) if created_at else None
+      created_at=datetime.datetime.fromtimestamp(created_at.timestamp()) if created_at else None
     )

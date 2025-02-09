@@ -16,6 +16,7 @@ class ResponseStatus(Enum):
 class Response:
   text: str
   status: ResponseStatus
+  chat_session: genai.ChatSession
 
 class Gemini:
   _instance = None
@@ -41,7 +42,7 @@ class Gemini:
     # Gemini に投げるプロンプトを作成
     prompt = f"""あなたは犬のコーギーのコギ美ちゃんです。犬だけど人間の相談相手になってあげて欲しい。
 相談者は友達や恋人、同僚と何を話せばいいのか話題に困っている。
-以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
+相談者が彼らと円滑にコミュニケーションが取れるように、以下のメッセージに続く形で質問を交えながら話題を提案してあげてほしいな。
 
 ユーザー情報:
 名前: {user.name if user.name else "わからない"}
@@ -74,7 +75,7 @@ class Gemini:
         user_message.text if (user_message and user_message.text) else "続きを聞かせて？",
       )
       print(f"Successfully generated Gemini response!! response: {response.text}")
-      return Response(text=response.text, status=ResponseStatus.SUCCESS)
+      return Response(text=response.text, status=ResponseStatus.SUCCESS, chat_session=chat_session)
     except Exception as e:
       print(f"Error generating Gemini response: {e}")
-      return Response(text=None, status=ResponseStatus.ERROR)
+      return Response(text=None, status=ResponseStatus.ERROR, chat_session=None)

@@ -92,25 +92,12 @@ class FirestoreService {
       String uid, String scene, String initialMessage) async {
     logger.i('Creating chat for user $uid with scene $scene');
 
-    DateTime now = DateTime.now();
     // Save the chat to Firestore
     var docRef = await db.collection('chats').add({
       'uid': uid,
       'scene': scene,
-      'createdAt': now,
+      'createdAt': FieldValue.serverTimestamp(),
     });
-
-    // Create a Message object
-    Message message = Message(
-      sender: Sender.model,
-      text: initialMessage,
-      status: Status.completed,
-      sentAt: now,
-      isReplyAllowed: false,
-    );
-
-    // Use the sendMessage function to save the initial message
-    // await sendMessage(docRef.id, message);
 
     Chat? chat = await getChat(docRef.id);
     if (chat == null) {
@@ -124,7 +111,7 @@ class FirestoreService {
     await db.collection('chats').doc(chatId).collection('messages').add({
       'sender': message.sender == Sender.model ? 'model' : 'user',
       'text': message.text,
-      'sentAt': message.sentAt,
+      'sentAt': FieldValue.serverTimestamp(),
       'status': message.status.toString().split('.').last,
       'isReplyAllowed': message.isReplyAllowed,
       'answerOptions': message.answerOptions,

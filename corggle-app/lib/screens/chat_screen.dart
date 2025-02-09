@@ -64,7 +64,6 @@ class _ChatScreenState extends State<ChatScreen> {
             sender: Sender.user,
             text: _controller.text,
             status: Status.completed,
-            sentAt: DateTime.now(),
             isReplyAllowed: false),
       );
 
@@ -82,7 +81,6 @@ class _ChatScreenState extends State<ChatScreen> {
           sender: Sender.user,
           text: option,
           status: Status.completed,
-          sentAt: DateTime.now(),
           isReplyAllowed: false,
         ),
       );

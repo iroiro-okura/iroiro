@@ -45,7 +45,7 @@ class Firestore:
       'sender': message.sender.value,
       'status': message.status.value,
       'text': message.text,
-      'sentAt': message.sent_at,
+      'sentAt': firestore.firestore.SERVER_TIMESTAMP,
       'isReplyAllowed': message.is_reply_allowed,
       'answerOptions': message.answer_options
     })
@@ -58,10 +58,8 @@ class Firestore:
     """Firestore のメッセージを更新する"""
     message_ref = cls().db.collection('chats').document(chat_id).collection('messages').document(message_id)
     message_ref.update({
-      'sender': message.sender.value,
       'status': message.status.value,
       'text': message.text,
-      'sentAt': message.sent_at,
       'isReplyAllowed': message.is_reply_allowed,
       'answerOptions': message.answer_options
     })

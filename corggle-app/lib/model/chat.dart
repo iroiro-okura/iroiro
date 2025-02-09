@@ -38,7 +38,6 @@ class Message {
   final Sender sender;
   final String text;
   final Status status;
-  final DateTime sentAt;
   final bool isReplyAllowed;
   final List<String>? answerOptions;
 
@@ -46,7 +45,6 @@ class Message {
     required this.sender,
     required this.text,
     required this.status,
-    required this.sentAt,
     required this.isReplyAllowed,
     this.answerOptions,
   });
@@ -58,7 +56,6 @@ class Message {
       text: data['text'] as String,
       status: Status.values
           .firstWhere((e) => e.toString() == 'Status.${data['status']}'),
-      sentAt: (data['sentAt'] as Timestamp).toDate(),
       isReplyAllowed: data['isReplyAllowed'] as bool,
       answerOptions: List<String>.from(data['answerOptions'] as List? ?? []),
     );
@@ -66,7 +63,7 @@ class Message {
 
   @override
   String toString() {
-    return 'Message{sender: $sender, text: $text, sentAt: $sentAt, status: $status, isReplyAllowed: $isReplyAllowed, answerOptions: $answerOptions}';
+    return 'Message{sender: $sender, text: $text, status: $status, isReplyAllowed: $isReplyAllowed, answerOptions: $answerOptions}';
   }
 }
 

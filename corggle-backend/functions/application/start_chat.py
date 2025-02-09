@@ -34,7 +34,7 @@ def create_initial_message_text(scene: str) -> str:
   initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！\n"
   if (scene):
     initial_message += f"今回は『{scene}』で話題を探しているんだね。\n"
-  initial_message += "あなたや他の人のプロフィールや興味ありそうなことをもう少し教えてほしいな！"
+  initial_message += "みんなのプロフィールや興味ありそうなことをもう少し教えてほしいな！"
   return initial_message
 
 __all__ = ['start_chat']
