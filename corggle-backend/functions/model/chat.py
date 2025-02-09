@@ -7,6 +7,7 @@ from firebase_functions import firestore_fn
 class Chat:
   uid: str
   scene: str
+  title: Optional[str]
   created_at: Optional[datetime.datetime]
   
   @classmethod
@@ -17,5 +18,7 @@ class Chat:
     return cls(
       uid=data.get('uid'),
       scene=data.get('scene') if data.get('scene') else '',
+      title=data.get('title'),
       created_at=datetime.datetime.fromtimestamp(created_at.timestamp()) if created_at else None
     )
+  

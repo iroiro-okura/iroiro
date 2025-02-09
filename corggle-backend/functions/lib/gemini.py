@@ -43,7 +43,9 @@ class Gemini:
   ) -> Response:
     """Gemini にプロンプトを投げてレスポンスを生成する"""
 
-    initial_message = create_initial_message_text(chat.scene)
+    initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！"
+    if (chat.scene):
+      initial_message += f"今回は『{chat.scene}』で話題を探しているんだね。"
     # Gemini に投げるプロンプトを作成
     prompt = f"""あなたは犬のコーギーのコギ美ちゃんです。犬だけど人間の相談相手になってあげて欲しい。
 相談者は友達や恋人、同僚と何を話せばいいのか話題に困っている。
@@ -92,6 +94,9 @@ class Gemini:
 
   @classmethod
   def suggest_answer_options(cls, chat_session: genai.ChatSession) -> list[str]:
+    if (not chat_session):
+      print("Chat session is not provided.")
+      return []
     """Gemini に質問を投げて回答候補を生成する"""
     prompt = """
 ここまでの会話を踏まえて、次の質問に対する回答候補を提案してください。
@@ -122,8 +127,23 @@ class Gemini:
       print(f"Error generating Gemini answer options: {e}")
       return []
 
-def create_initial_message_text(scene: str) -> str:
-  initial_message = "Corggleへようこそ！AIコーギのコギ美がサポートするよ！"
-  if (scene):
-    initial_message += f"今回は『{scene}』で話題を探しているんだね。"
-  return initial_message
+  @classmethod
+  def give_title_to_chat(cls, chat_session: genai.ChatSession) -> Optional[str]:
+    """Gemini にタイトルを付けてもらう"""
+    if (not chat_session):
+      print("Chat session is not provided.")
+      return None
+
+    prompt = """
+ここまでの会話を踏まえて、このチャットにふさわしいタイトルを提案してください。
+タイトルは以下の制約に従ってください。
+* タイトルは最大20文字以内の日本語とする。
+* タイトルは1行のみで記述する。
+"""
+    try:
+      response = chat_session.send_message(prompt)
+      title = response.text.strip()
+      return title if title else None
+    except Exception as e:
+      print(f"Error generating Gemini title: {e}")
+      return None

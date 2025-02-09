@@ -30,6 +30,16 @@ class Firestore:
     return Chat.from_snapshot(chat_ref)
   
   @classmethod
+  def update_chat(cls, chat_id: str, chat: Chat) -> None:
+    """Firestore のチャット情報を更新する"""
+    chat_ref = cls().db.collection('chats').document(chat_id)
+    chat_ref.update({
+      'scene': chat.scene,
+      'title': chat.title
+    })
+    print(f"Chat updated in Firestore: chat_id: {chat_id}")
+  
+  @classmethod
   def get_messages(cls, chat_id: str) -> list[SentMessage]:
     """Firestore からチャットのメッセージを取得する"""
     messages = []
