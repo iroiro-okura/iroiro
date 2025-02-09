@@ -143,11 +143,17 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: CorggleAppBar(),
       floatingActionButton: SizedBox(
-          width: 30,
-          height: 30,
+          width: 40,
+          height: 40,
           child: FloatingActionButton(
             onPressed: _startNewChat,
-            child: const Icon(Icons.add),
+            backgroundColor: theme.colorScheme.secondary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              Icons.add_comment_rounded,
+            ),
           )),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: Column(
@@ -165,7 +171,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: AnimatedDots());
+                    return const Center(child: Text('チャット履歴はありません。'));
                   }
 
                   final messages = snapshot.data;
@@ -248,9 +254,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '質問候補:',
+                                messages.last.answerOptions != null &&
+                                        messages.last.answerOptions!.isNotEmpty
+                                    ? '話題候補:'
+                                    : '',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: theme.colorScheme.onSurface,
                                 ),
