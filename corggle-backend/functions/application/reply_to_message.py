@@ -19,7 +19,7 @@ def reply_to_message(chat_id: str, message_id: str, message: Message):
   # 現在のmessageを除いてhistoryを作成
   history = [msg for msg in messages if msg.message_id != message_id]
   print(f"Generating gemini response")
-  response = Gemini.generate_gemini_response(user, chat, history, message)
+  response = Gemini.send_message_to_gemini(user, chat, history, message)
   message = ""
   if (response.status == ResponseStatus.ERROR):
     message = SeningMessage.failed("コギ美がエラーに遭遇したみたいだね。")

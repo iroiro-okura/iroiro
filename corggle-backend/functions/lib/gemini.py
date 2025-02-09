@@ -32,7 +32,7 @@ class Gemini:
     return cls._instance
 
   @classmethod
-  def generate_gemini_response(
+  def send_message_to_gemini(
     cls, user: User, chat: Chat,
     message_history: list[Message], user_message: Message = None
   ) -> Response:
@@ -53,14 +53,14 @@ class Gemini:
 
 チャット情報:
 場面: {chat.scene}
-時間: {chat.created_at}
+開始時間: {chat.created_at}
 
 注意事項:
 - 日本語での返答をする
 - 会話はフレンドリーで親しみやすく
 - 会話は簡潔でわかりやすく
-- 質問は一度に1つずつ
-- 短めの応答で会話が続くように心がける
+- 短めの応答で会話続けるように心がける
+- 一度にあまりたくさんの質問をするのは避ける
 """
 
     history = [{"role": msg.sender.value, "parts": msg.text} for msg in message_history]
