@@ -244,34 +244,50 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (messages.last.answerOptions != null)
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Wrap(
-                            spacing: 8.0,
-                            runSpacing: 8.0,
-                            alignment: WrapAlignment.center,
-                            children:
-                                messages.last.answerOptions!.map((option) {
-                              return SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.45,
-                                child: ElevatedButton(
-                                  onPressed: () =>
-                                      _sendMessageFromOption(option),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        theme.colorScheme.secondary,
-                                    foregroundColor:
-                                        theme.colorScheme.onSecondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    option,
-                                    softWrap: true,
-                                    textAlign: TextAlign.center,
-                                  ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '質問候補:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onSurface,
                                 ),
-                              );
-                            }).toList(),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8.0,
+                                runSpacing: 8.0,
+                                alignment: WrapAlignment.center,
+                                children:
+                                    messages.last.answerOptions!.map((option) {
+                                  return SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.45,
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          _sendMessageFromOption(option),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            theme.colorScheme.secondary,
+                                        foregroundColor:
+                                            theme.colorScheme.onSecondary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        option,
+                                        softWrap: true,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
                           ),
                         ),
                     ],
