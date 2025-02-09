@@ -162,8 +162,49 @@ class _ChatScreenState extends State<ChatScreen> {
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     final uid = userProvider.user!.uid;
 
-    chatProvider.createNewChat(uid, "");
-    chatProvider.setScene("");
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('新しいチャットを開始'),
+          content: const Text('シーンを選択してください。'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await chatProvider.createNewChat(uid, "フリートーク");
+                chatProvider.setScene("フリートーク");
+              },
+              child: const Text('フリートーク'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await chatProvider.createNewChat(uid, dating);
+                chatProvider.setScene(dating);
+              },
+              child: const Text(dating),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await chatProvider.createNewChat(uid, reunion);
+                chatProvider.setScene(reunion);
+              },
+              child: const Text(reunion),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await chatProvider.createNewChat(uid, companyGathering);
+                chatProvider.setScene(companyGathering);
+              },
+              child: const Text(companyGathering),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -192,7 +233,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           const Gap(20),
           if (chatProvider.chat == null)
-            const CircularProgressIndicator()
+            const Center(child: Text('チャット履歴はありません。'))
           else
             Expanded(
               child: StreamBuilder<List<Message>>(
