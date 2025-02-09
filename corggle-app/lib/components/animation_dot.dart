@@ -34,7 +34,10 @@ class _AnimatedDotsState extends State<AnimatedDots> {
   Widget build(BuildContext context) {
     return Text(
       '.' * _dotCount,
-      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.secondary),
     );
   }
 }

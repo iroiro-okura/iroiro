@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:iroiro/common/showLoadingDialog.dart';
 import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/components/custom_button.dart';
 import 'package:iroiro/firebase/auth.dart';
@@ -18,18 +19,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() {
       _isLoading = true;
     });
+    await showLoadingDialog(context: context);
 
     try {
       await AuthService.signIn();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Sign-in failed: $e')));
+            .showSnackBar(SnackBar(content: Text('サインインに失敗しました: $e')));
       }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        Navigator.of(context).pop();
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -91,7 +96,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ],
                     ),
-                    const Gap(40),
+                    const Spacer(),
                     Column(
                       children: [
                         Text(
@@ -99,7 +104,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           style: TextStyle(
                               fontFamily: "Alexandria",
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w300),
                         ),
                         CustomButton(
@@ -121,7 +126,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               fontWeight: FontWeight.w800),
                         ),
                       ],
-                    )
+                    ),
+                    const Gap(40),
                   ],
                 ),
               ),

@@ -27,7 +27,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         stream: FirestoreService.chatStream(uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.secondary,
+            ));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('チャット履歴はありません。'));
