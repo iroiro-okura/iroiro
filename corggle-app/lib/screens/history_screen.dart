@@ -71,10 +71,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         subtitle: Text(chat.scene),
                         trailing: Icon(Icons.arrow_forward_ios,
                             color: Theme.of(context).colorScheme.secondary),
-                        onTap: () {
+                        onTap: () async {
                           final chatProvider =
                               Provider.of<ChatProvider>(context, listen: false);
-                          chatProvider.getChat(chat.chatId);
+                          await chatProvider.getChat(chat.chatId);
                           chatProvider.setScene(chat.scene);
                           widget.controller
                               .jumpToTab(1); // Navigate to chat tab
