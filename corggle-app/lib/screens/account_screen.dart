@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
 import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/firebase/auth.dart';
 import 'package:iroiro/firebase/firestore.dart';
 import 'package:iroiro/model/user.dart';
 import 'package:iroiro/providers/user_provider.dart';
+import 'package:iroiro/screens/privacy_policy_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 
@@ -427,6 +429,18 @@ class _AccountScreenState extends State<AccountScreen> {
                 child: _isLoading
                     ? CircularProgressIndicator()
                     : const Text('サインアウト'),
+              ),
+              const Gap(10),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PrivacyPolicyScreen(),
+                    ),
+                  );
+                },
+                child: const Text('プライバシーポリシー'),
               ),
             ],
           ),

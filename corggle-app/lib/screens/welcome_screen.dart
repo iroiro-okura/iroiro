@@ -4,6 +4,7 @@ import 'package:iroiro/common/showLoadingDialog.dart';
 import 'package:iroiro/components/app_bar.dart';
 import 'package:iroiro/components/custom_button.dart';
 import 'package:iroiro/firebase/auth.dart';
+import 'package:iroiro/screens/privacy_policy_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -123,6 +124,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                         ],
                       ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PrivacyPolicyScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text('プライバシーポリシー'),
+                    ),
                     const Gap(40),
                   ],
                 ),
