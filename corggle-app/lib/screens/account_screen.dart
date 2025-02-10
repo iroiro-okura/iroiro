@@ -104,7 +104,25 @@ class _AccountScreenState extends State<AccountScreen> {
                   style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
                 const SizedBox(height: 8),
-                _buildDropdownButtonFormField(gender),
+                DropdownButtonFormField<Gender>(
+                  value: gender.isNotEmpty
+                      ? Gender.values.firstWhere(
+                          (e) => e.toString().split('.').last == gender)
+                      : null,
+                  decoration: const InputDecoration(labelText: '性別'),
+                  items: Gender.values
+                      .map((label) => DropdownMenuItem(
+                            value: label,
+                            child: Text(_getGenderDisplayName(
+                                label.toString().split('.').last)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      gender = value?.toString().split('.').last ?? '';
+                    });
+                  },
+                ),
                 _buildTextField(ageController, '年齢', TextInputType.number),
                 _buildTextField(occupationController, '職業'),
                 _buildTextField(hometownController, '出身地'),
@@ -282,28 +300,6 @@ class _AccountScreenState extends State<AccountScreen> {
       controller: controller,
       decoration: InputDecoration(labelText: labelText),
       keyboardType: keyboardType,
-    );
-  }
-
-  Widget _buildDropdownButtonFormField(String gender) {
-    return DropdownButtonFormField<Gender>(
-      value: gender.isNotEmpty
-          ? Gender.values
-              .firstWhere((e) => e.toString().split('.').last == gender)
-          : null,
-      decoration: const InputDecoration(labelText: '性別'),
-      items: Gender.values
-          .map((label) => DropdownMenuItem(
-                value: label,
-                child: Text(
-                    _getGenderDisplayName(label.toString().split('.').last)),
-              ))
-          .toList(),
-      onChanged: (value) {
-        setState(() {
-          _gender = value?.toString().split('.').last ?? '';
-        });
-      },
     );
   }
 
