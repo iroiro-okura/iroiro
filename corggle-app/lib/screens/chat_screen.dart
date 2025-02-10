@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
@@ -10,6 +11,7 @@ import 'package:iroiro/providers/user_provider.dart';
 import 'package:iroiro/screens/error_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -119,32 +121,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Widget _buildAvatar(String name, bool isUser, Status? status) {
-    if (isUser) {
-      return ClipOval(
-        child: SvgPicture.string(
-          RandomAvatarString(name),
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-        ),
-      );
-    } else {
-      return ClipRRect(
-        child: Image.asset(
-          status == Status.inProgress
-              ? 'assets/images/cogimi_thinking.png'
-              : status == Status.failed
-                  ? 'assets/images/cogimi_sad.png'
-                  : 'assets/images/cogimi.png',
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-        ),
-      );
-    }
-  }
-
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -208,6 +184,118 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       },
     );
+  }
+
+  Widget _buildAvatar(String name, bool isUser, Status? status) {
+    if (isUser) {
+      return ClipOval(
+        child: SvgPicture.string(
+          RandomAvatarString(name),
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      return ClipRRect(
+        child: Image.asset(
+          status == Status.inProgress
+              ? 'assets/images/cogimi_thinking.png'
+              : status == Status.failed
+                  ? 'assets/images/cogimi_sad.png'
+                  : 'assets/images/cogimi.png',
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+  }
+
+  Future<void> _launchURL(String url) async {
+    final uri = Uri.parse(url);
+    logger.d(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+    } else {
+      throw 'Could not launch $uri';
+    }
+  }
+
+  List<TextSpan> _buildTextSpans(String text) {
+    final RegExp markdownRegExp = RegExp(
+      r"(\*\*(.*?)\*\*)" // **太字**
+      r"|(\*(.*?)\*)" // *斜体*
+      r"|(`(.*?)`)" // `コード`
+      r"|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)" // [リンクテキスト](URL)
+      r"|(https?:\/\/[a-zA-Z0-9.-]+(?:\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?)", // 通常のURL
+      caseSensitive: false,
+      multiLine: true,
+    );
+
+    final List<TextSpan> spans = [];
+    final matches = markdownRegExp.allMatches(text);
+
+    int lastMatchEnd = 0;
+    for (final match in matches) {
+      if (match.start > lastMatchEnd) {
+        spans.add(TextSpan(text: text.substring(lastMatchEnd, match.start)));
+      }
+
+      if (match.group(2) != null) {
+        // **太字**
+        spans.add(TextSpan(
+          text: match.group(2),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ));
+      } else if (match.group(4) != null) {
+        // *斜体*
+        spans.add(TextSpan(
+          text: match.group(4),
+          style: const TextStyle(fontStyle: FontStyle.italic),
+        ));
+      } else if (match.group(6) != null) {
+        // `コード`
+        spans.add(TextSpan(
+          text: match.group(6),
+          style: TextStyle(
+            fontFamily: 'monospace',
+            backgroundColor: Colors.grey.withAlpha(20),
+          ),
+        ));
+      } else if (match.group(7) != null && match.group(8) != null) {
+        // [リンクテキスト](URL)
+        final linkText = match.group(7)!;
+        final url = match.group(8)!;
+        spans.add(
+          TextSpan(
+            text: linkText,
+            style: const TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+            recognizer: TapGestureRecognizer()..onTap = () => _launchURL(url),
+          ),
+        );
+      } else if (match.group(9) != null) {
+        // 通常のURL
+        final url = match.group(9)!;
+        spans.add(
+          TextSpan(
+            text: url,
+            style: const TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+            recognizer: TapGestureRecognizer()..onTap = () => _launchURL(url),
+          ),
+        );
+      }
+
+      lastMatchEnd = match.end;
+    }
+
+    if (lastMatchEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastMatchEnd)));
+    }
+
+    return spans;
   }
 
   @override
@@ -318,7 +406,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                       child: message.status == Status.inProgress
                                           ? const AnimatedDots()
                                           : message.status == Status.completed
-                                              ? SelectableText(message.text)
+                                              ? SelectableText.rich(
+                                                  TextSpan(
+                                                    children: _buildTextSpans(
+                                                        message.text),
+                                                  ),
+                                                )
                                               : Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
@@ -356,10 +449,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              messages.last.answerOptions != null &&
-                                      messages.last.answerOptions!.isNotEmpty
-                                  ? '候補:'
-                                  : '',
+                              '',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -373,30 +463,28 @@ class _ChatScreenState extends State<ChatScreen> {
                               alignment: WrapAlignment.start,
                               children:
                                   messages.last.answerOptions!.map((option) {
-                                return Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () =>
-                                        _sendMessageFromOption(option),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          theme.colorScheme.secondary,
-                                      foregroundColor:
-                                          theme.colorScheme.onSecondary,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
+                                return ElevatedButton(
+                                  onPressed: () =>
+                                      _sendMessageFromOption(option),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        theme.colorScheme.secondary,
+                                    foregroundColor:
+                                        theme.colorScheme.onSecondary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: Text(
-                                      option,
-                                      softWrap: true,
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.visible,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: theme.colorScheme.onSecondary,
-                                      ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
+                                  ),
+                                  child: Text(
+                                    option,
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.visible,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: theme.colorScheme.onSecondary,
                                     ),
                                   ),
                                 );

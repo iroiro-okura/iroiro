@@ -47,6 +47,7 @@ dependencies:
   random_avatar: ^0.0.8
   flutter_svg: ^2.0.17
   intl: ^0.20.2
+  url_launcher: ^6.3.1
 
 flutter_icons:
   android: true
