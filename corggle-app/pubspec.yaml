@@ -52,9 +52,9 @@ dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/icon/icon_transparent.png"
   adaptive_icon_background: "#D8D8A8"
-  adaptive_icon_foreground: "assets/icon/icon_transparent.png"
+  adaptive_icon_foreground: "assets/icon/icon_small.png"
 
 dev_dependencies:
   flutter_test:
@@ -73,10 +73,14 @@ dev_dependencies:
 flutter_native_splash:
   color: "#D8D8A8"
   fullscreen: true
+  image: "assets/images/splash.png"
   android: true
   ios: true
   android_12:
     icon_background_color: "#D8D8A8"
+    image: "assets/images/splash_android.png"
+    icon_background_color_dark: "#D8D8A8"
+    image_dark: "assets/images/splash_android.png"
 
 # The following section is specific to Flutter packages.
 flutter:
