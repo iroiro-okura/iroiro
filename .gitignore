@@ -2,3 +2,4 @@
 !*.secret
 corggle-app/android/app/google-services.json
 corggle-app/release-key.jks
+corggle-app/ios/Runner/GoogleService-Info.plist
