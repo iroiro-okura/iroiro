@@ -352,62 +352,57 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                       if (messages.last.answerOptions != null)
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                messages.last.answerOptions != null &&
-                                        messages.last.answerOptions!.isNotEmpty
-                                    ? '候補:'
-                                    : '',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onSurface,
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              messages.last.answerOptions != null &&
+                                      messages.last.answerOptions!.isNotEmpty
+                                  ? '候補:'
+                                  : '',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurface,
                               ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 4.0,
-                                runSpacing: 2.0,
-                                alignment: WrapAlignment.start,
-                                children:
-                                    messages.last.answerOptions!.map((option) {
-                                  return Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: () =>
-                                          _sendMessageFromOption(option),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            theme.colorScheme.secondary,
-                                        foregroundColor:
-                                            theme.colorScheme.onSecondary,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2, horizontal: 8
-                                        ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 4.0,
+                              runSpacing: 4.0,
+                              alignment: WrapAlignment.start,
+                              children:
+                                  messages.last.answerOptions!.map((option) {
+                                return Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () =>
+                                        _sendMessageFromOption(option),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          theme.colorScheme.secondary,
+                                      foregroundColor:
+                                          theme.colorScheme.onSecondary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                      child: Text(
-                                        option,
-                                        softWrap: true,
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.visible,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: theme.colorScheme.onSecondary,
-                                        ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4, horizontal: 8),
+                                    ),
+                                    child: Text(
+                                      option,
+                                      softWrap: true,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.visible,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: theme.colorScheme.onSecondary,
                                       ),
                                     ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ),
                     ],
                   );
