@@ -25,7 +25,7 @@ def reply_to_message(chat_id: str, message_id: str, message: Message):
   print(f"Generating gemini response")
   response = Gemini.generate_response(user, chat, history, message)
   if (response.status == ResponseStatus.ERROR):
-    message = SeningMessage.failed("コギ美がエラーに遭遇したみたいだね。")
+    message = SeningMessage.failed("こぎ美がエラーに遭遇したみたいだね。")
     Firestore.update_message(chat_id, reply_message_id, message)
   elif (response.status == ResponseStatus.SUCCESS):
     message = SeningMessage.completed(response.text, reply_allowed=True)
