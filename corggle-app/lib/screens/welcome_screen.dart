@@ -19,21 +19,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() {
       _isLoading = true;
     });
-    await showLoadingDialog(context: context);
+    // await showLoadingDialog(context: context);
 
     try {
       await AuthService.signIn();
+      // Navigator.of(context, rootNavigator: true).pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('サインインに失敗しました: $e')));
-      }
-    } finally {
-      if (mounted) {
-        Navigator.of(context).pop();
-        setState(() {
-          _isLoading = false;
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('サインインに失敗しました: $e')),
+        );
       }
     }
   }
@@ -97,36 +92,37 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ],
                     ),
                     const Spacer(),
-                    Column(
-                      children: [
-                        Text(
-                          _isLoading ? 'Loading...' : 'Googleでログイン',
-                          style: TextStyle(
-                              fontFamily: "Alexandria",
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w300),
-                        ),
-                        CustomButton(
-                          onPressed: _isLoading ? () => {} : _handleSignIn,
-                          buttonTitle: 'G',
-                          buttonStyle: ElevatedButton.styleFrom(
-                            backgroundColor: _isLoading
-                                ? Color.fromARGB(100, 51, 6, 5)
-                                : Color.fromARGB(50, 51, 6, 5),
-                            fixedSize: const Size(150, 45),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(7)),
-                            ),
+                    if (_isLoading)
+                      const CircularProgressIndicator()
+                    else
+                      Column(
+                        children: [
+                          Text(
+                            'Googleでログイン',
+                            style: TextStyle(
+                                fontFamily: "Alexandria",
+                                fontSize: 12,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w300),
                           ),
-                          textStyle: const TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 1),
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
+                          CustomButton(
+                            onPressed: () => _handleSignIn(),
+                            buttonTitle: 'G',
+                            buttonStyle: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromARGB(50, 51, 6, 5),
+                              fixedSize: const Size(150, 45),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(7)),
+                              ),
+                            ),
+                            textStyle: const TextStyle(
+                                color: Color.fromRGBO(255, 255, 255, 1),
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
                     const Gap(40),
                   ],
                 ),

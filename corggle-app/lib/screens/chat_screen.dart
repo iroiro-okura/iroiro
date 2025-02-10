@@ -335,7 +335,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('チャット履歴はありません。'));
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   final messages = snapshot.data;

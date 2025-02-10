@@ -26,8 +26,10 @@ class User {
       name: data['name'] as String,
       age: data['age'] as int?,
       gender: data['gender'] != null
-          ? Gender.values
-              .firstWhere((e) => e.toString() == 'Gender.${data['gender']}')
+          ? Gender.values.firstWhere(
+              (e) => e.toString() == 'Gender.${data['gender']}',
+              orElse: () => Gender.other,
+            )
           : null,
       occupation: data['occupation'] as String?,
       hometown: data['hometown'] as String?,

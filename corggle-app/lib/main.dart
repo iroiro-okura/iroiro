@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
             '/history': (context) =>
                 HistoryScreen(controller: PersistentTabController()),
             '/account': (context) => const AccountScreen(),
-            '/error':  (context) => const ErrorScreen(),
+            '/error': (context) => const ErrorScreen(),
           },
           theme: ThemeData(
             fontFamily: 'Murecho',

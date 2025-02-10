@@ -76,9 +76,7 @@ class HomeScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30)),
                             ),
-                            onPressed: () {
-                              controller.jumpToTab(1);
-                            },
+                            onPressed: () => _handleTap(context, ''),
                             child: const Text('話題を見つける'),
                           ),
                           const Gap(10),

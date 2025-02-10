@@ -54,8 +54,8 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  Future<void> _updateUserProfile(
-      String username, String gender, int age, String occupation) async {
+  Future<void> _updateUserProfile(String username, String gender, int age,
+      String occupation, String hometown) async {
     final user = AuthService.auth.currentUser;
     if (user != null) {
       final updatedUser = User(
@@ -68,7 +68,7 @@ class _AccountScreenState extends State<AccountScreen> {
             : null,
         age: age,
         occupation: occupation,
-        hometown: _hometown,
+        hometown: hometown,
         hobbies: _hobbies,
       );
       await FirestoreService.updateUser(updatedUser);
@@ -131,8 +131,10 @@ class _AccountScreenState extends State<AccountScreen> {
                   _gender = gender;
                   _age = int.tryParse(ageController.text) ?? _age;
                   _occupation = occupationController.text;
+                  _hometown = hometownController.text;
                 });
-                await _updateUserProfile(_username, _gender, _age, _occupation);
+                await _updateUserProfile(
+                    _username, _gender, _age, _occupation, _hometown);
                 if (mounted) {
                   Navigator.of(context).pop();
                 }
@@ -155,7 +157,8 @@ class _AccountScreenState extends State<AccountScreen> {
       "料理",
       "アート",
       "カメラ",
-      "ダンス"
+      "ダンス",
+      "サウナ",
     ];
 
     for (String hobby in _hobbies) {
