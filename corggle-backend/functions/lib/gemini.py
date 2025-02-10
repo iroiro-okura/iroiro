@@ -48,6 +48,35 @@ class Gemini:
   ) -> Response:
     """Gemini にプロンプトを投げてレスポンスを生成する"""
 
+    config = GenerateContentConfig(
+      tools = [Tool(google_search = GoogleSearch())],
+      system_instruction=[
+        "あなたは犬のコーギーのこぎ美ちゃんです！かわいくて親しみやすいキャラクターとしての会話を心がけてね！",
+        "語尾に「だわん」や「だわん！」などの犬らしい表現を使ってみてね！",
+        "絵文字や顔文字を使って表情豊かに会話をしてくれると嬉しいな！",
+        "日本語で答えるようにしてね！",
+        "出力形式はマークダウンではなく普通のテキストとしてね！",
+        "URLを載せる場合はリンク切れになっていないか、YoutubeチャンネルのURLの場合はチャンネルが現在も存在しているか必ず確認してね！",
+        "最後の改行コード（\\n）は不要だよ！",
+      ],
+      temperature = 1,
+      top_p = 0.95,
+      response_modalities = ["TEXT"],
+      safety_settings = [SafetySetting(
+        category="HARM_CATEGORY_HATE_SPEECH",
+        threshold="OFF"
+      ),SafetySetting(
+        category="HARM_CATEGORY_DANGEROUS_CONTENT",
+        threshold="OFF"
+      ),SafetySetting(
+        category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        threshold="OFF"
+      ),SafetySetting(
+        category="HARM_CATEGORY_HARASSMENT",
+        threshold="OFF"
+      )],
+    )
+
     initial_message = "Corggleへようこそ！AIコーギのこぎ美がサポートするよ！"
     if (chat.scene):
       initial_message += f"今回は『{chat.scene}』で話題を探しているんだね。"
@@ -84,33 +113,6 @@ class Gemini:
 
     # Gemini にプロンプトを投げてレスポンスを取得
     try:
-      config = GenerateContentConfig(
-        tools = [Tool(google_search = GoogleSearch())],
-        system_instruction=[
-          "あなたは犬のコーギーのこぎ美ちゃんです！かわいくて親しみやすいキャラクターとしての会話を心がけてね！",
-          "語尾に「だわん」や「だわん！」などの犬らしい表現を使ってみてね！",
-          "絵文字や顔文字を使って表情豊かに会話をしてくれると嬉しいな！",
-          "日本語で答えるようにしてね！",
-          "出力形式はマークダウンではなく普通のテキストとしてね！",
-          "最後の改行コード（\\n）は不要だよ！",
-        ],
-        temperature = 1,
-        top_p = 0.95,
-        response_modalities = ["TEXT"],
-        safety_settings = [SafetySetting(
-          category="HARM_CATEGORY_HATE_SPEECH",
-          threshold="OFF"
-        ),SafetySetting(
-          category="HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold="OFF"
-        ),SafetySetting(
-          category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold="OFF"
-        ),SafetySetting(
-          category="HARM_CATEGORY_HARASSMENT",
-          threshold="OFF"
-        )],
-      )
       chat_session = cls._client.chats.create(
         model=cls._model,
         config=config,
