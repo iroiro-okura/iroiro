@@ -11,8 +11,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: RichText(
-            text: const TextSpan(
-              style: TextStyle(fontSize: 16, color: Colors.black),
+            text: TextSpan(
+              style: TextStyle(
+                  fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
               children: [
                 TextSpan(
                   text: 'プライバシーポリシー\n',
