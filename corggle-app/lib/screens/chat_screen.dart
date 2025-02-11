@@ -23,6 +23,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  double _optionsHeight = 100.0;
 
   ChatProvider? _chatProvider;
   String? _failedMessage;
@@ -125,7 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          _scrollController.position.maxScrollExtent + _optionsHeight,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -445,53 +446,105 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                       if (messages.last.answerOptions != null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onSurface,
+                        StatefulBuilder(builder: (context, setState) {
+                          return Column(
+                            children: [
+                              GestureDetector(
+                                onVerticalDragUpdate: (details) {
+                                  setState(() {
+                                    _optionsHeight -= details.delta.dy;
+                                    if (_optionsHeight < 50) {
+                                      _optionsHeight = 50;
+                                    } else if (_optionsHeight > 150) {
+                                      _optionsHeight = 150;
+                                    }
+                                  });
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 14,
+                                      width: MediaQuery.of(context).size.width,
+                                      color: theme.colorScheme.tertiary
+                                          .withAlpha(70),
+                                      child: Center(
+                                        child: Container(
+                                          height: 4,
+                                          width: 15,
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.tertiary,
+                                            borderRadius:
+                                                BorderRadius.circular(2),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const Gap(10),
+                                    SizedBox(
+                                      height: _optionsHeight,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Wrap(
+                                                spacing: 4.0,
+                                                runSpacing: 4.0,
+                                                alignment: WrapAlignment.start,
+                                                children: messages
+                                                    .last.answerOptions!
+                                                    .map((option) {
+                                                  return ElevatedButton(
+                                                    onPressed: () =>
+                                                        _sendMessageFromOption(
+                                                            option),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor: theme
+                                                          .colorScheme
+                                                          .secondary,
+                                                      foregroundColor: theme
+                                                          .colorScheme
+                                                          .onSecondary,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 4,
+                                                          horizontal: 8),
+                                                    ),
+                                                    child: Text(
+                                                      option,
+                                                      softWrap: true,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      overflow:
+                                                          TextOverflow.visible,
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: theme.colorScheme
+                                                            .onSecondary,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              alignment: WrapAlignment.start,
-                              children:
-                                  messages.last.answerOptions!.map((option) {
-                                return ElevatedButton(
-                                  onPressed: () =>
-                                      _sendMessageFromOption(option),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        theme.colorScheme.secondary,
-                                    foregroundColor:
-                                        theme.colorScheme.onSecondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 4, horizontal: 8),
-                                  ),
-                                  child: Text(
-                                    option,
-                                    softWrap: true,
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.visible,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: theme.colorScheme.onSecondary,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
+                            ],
+                          );
+                        }),
                     ],
                   );
                 },
