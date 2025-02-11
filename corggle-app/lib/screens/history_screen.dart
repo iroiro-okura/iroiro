@@ -26,7 +26,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _loadChats() async {
-    final uid = Provider.of<UserProvider>(context, listen: false).user!.uid;
+    final uid = Provider.of<UserProvider>(context, listen: false).user?.uid;
+    if (uid == null) {
+      return;
+    }
     final chats = await FirestoreService.getAllChats(uid);
     setState(() {
       _chats = chats;
@@ -35,7 +38,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = Provider.of<UserProvider>(context, listen: false).user!.uid;
+    final uid = Provider.of<UserProvider>(context, listen: false).user?.uid;
+    if (uid == null) {
+      return CircularProgressIndicator();
+    }
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
     return Scaffold(

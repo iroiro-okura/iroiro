@@ -23,6 +23,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode(); // フォーカスを管理する
+
   double _optionsHeight = 100.0;
 
   ChatProvider? _chatProvider;
@@ -51,12 +53,18 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_chatProvider != chatProvider) {
       _chatProvider = chatProvider;
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.unfocus();
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     _controller.dispose();
+    _focusNode.dispose();
+
     super.dispose();
   }
 
@@ -71,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
             status: Status.completed,
             isReplyAllowed: false),
       );
-
+      _focusNode.unfocus();
       _controller.clear();
     }
   }
@@ -89,6 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
           isReplyAllowed: false,
         ),
       );
+      _focusNode.unfocus();
     }
   }
 
@@ -344,7 +353,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     return const Center(child: Text('チャット履歴はありません。'));
                   }
 
-                  _scrollToBottom();
+                  if (messages.last.answerOptions != null &&
+                      messages.last.answerOptions!.isNotEmpty) {
+                    _scrollToBottom();
+                  }
 
                   return Column(
                     children: [
@@ -556,6 +568,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
+                    focusNode: _focusNode,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     textInputAction: TextInputAction.newline,
